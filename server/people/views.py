@@ -31,6 +31,30 @@ def home(request):
     return redirect("guide_home" if profile.is_guide else "member_home")
 
 
+# Crawler and assistant files for the public site; absolute URLs use the address the visitor reached.
+PUBLIC_PAGES = (("/", "1.0"), ("/about/", "0.9"), ("/join/", "0.6"), ("/login/", "0.5"))
+
+
+def _site_root(request) -> str:
+    scheme = "https" if request.is_secure() or getattr(settings, "SESSION_COOKIE_SECURE", False) else "http"
+    return f"{scheme}://{request.get_host()}"
+
+
+def robots_txt(request):
+    return render(request, "site/robots.txt", {"root": _site_root(request)}, content_type="text/plain; charset=utf-8")
+
+
+def sitemap_xml(request):
+    return render(request, "site/sitemap.xml", {"root": _site_root(request), "pages": PUBLIC_PAGES},
+                  content_type="application/xml; charset=utf-8")
+
+
+def llms_txt(request):
+    cfg = get_config()
+    return render(request, "site/llms.txt", {"root": _site_root(request), "escrow": cfg.escrow_contract_id,
+                                             "token": cfg.token_contract_id}, content_type="text/plain; charset=utf-8")
+
+
 def about(request):
     """The problem Stelleye solves, for everyone (signed in or not)."""
     return render(request, "about.html")

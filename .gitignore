@@ -46,6 +46,8 @@ node_modules/
 design-system/
 docs/hackmeridian-submission.md
 *.pptx
+pitch.pdf
+*Pitch Deck*.pdf
 
 # OS / editors
 .DS_Store

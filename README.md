@@ -9,8 +9,21 @@
 
 **Live video help from sighted guides for visually impaired people, paid by the minute in USDC on Stellar.**
 
-**Try it live (Stellar testnet):** https://samanhazemijebelli--stelleye.us-east.modal.run. Sign in, open
-*Demo accounts*, and use Maria (caller) in one browser and Ana or Kofi (guide) in another.
+<table>
+  <tr>
+    <td>
+      <b>Try it live</b> (Stellar testnet): <a href="https://samanhazemijebelli--stelleye.us-east.modal.run">samanhazemijebelli--stelleye.us-east.modal.run</a><br><br>
+      Open two windows and sign in from <i>Demo accounts</i>:<br>
+      1. <b>Ana</b> (guide): tap <i>Go online</i>.<br>
+      2. <b>Maria</b> (caller): open <i>Guides</i>, then <i>Online now</i>, and call Ana.<br>
+      Kofi is a second guide if someone else is using Ana.
+    </td>
+    <td align="center">
+      <img src="docs/pitch/qr.png" width="150" alt="QR code that opens the live Stelleye demo"><br>
+      <sub>Scan to try it</sub>
+    </td>
+  </tr>
+</table>
 
 A visually impaired person taps one big button (or picks a guide they trust). A verified guide video calls them
 on WhatsApp and describes what the camera sees: a medicine label, the right bus, a form. The
@@ -22,7 +35,24 @@ Money moves on real rails: callers **Add money** by card or bank transfer and gu
 bank through a Stellar anchor (SEP-24), in Circle's USDC. On testnet that is Stellar's test anchor and
 Circle's testnet USDC; production swaps in a licensed anchor such as MoneyGram Ramps by configuration.
 
-Built for **HackMeridian 2026** (Genesis category, Stellar Unlocked track).
+Built for **HackMeridian 2026** (Genesis category, Stellar Composed track: our Soroban contract with Circle USDC and the SEP-24 anchor rails).
+
+## Pitch deck
+
+HackMeridian 2026 · Genesis · Stellar Composed.
+
+<p>
+  <img src="docs/pitch/slide-1.jpg" width="49%" alt="Cover: Stelleye, eyes on call for visually impaired people, paid on Stellar worldwide, with a QR code to the live demo">
+  <img src="docs/pitch/slide-2.jpg" width="49%" alt="The problem: 2.2 billion people live with a vision impairment (WHO); $26 a month buys 20 minutes of paid visual help (Aira); at 3 a.m. help must come from abroad; sending $200 across borders costs 6.49% (World Bank)">
+</p>
+<p>
+  <img src="docs/pitch/slide-3.jpg" width="49%" alt="The solution: match, lock, call, settle, pay; the caller and guide screens on two phones">
+  <img src="docs/pitch/slide-4.jpg" width="49%" alt="Market: two sides, people who need eyes and people who lend them; a 5% fee on each guide payout; $1.30 a minute today versus 0.20 USDC a minute on Stelleye">
+</p>
+<p>
+  <img src="docs/pitch/slide-5.jpg" width="49%" alt="Roadmap: v1 human guides, passkey wallets, global rails, then a fully automatic 3D understanding and navigation visual harness">
+  <img src="docs/pitch/slide-6.jpg" width="49%" alt="The team: Saman Hazemijebelli, solo builder, with a QR code to try Stelleye">
+</p>
 
 ## Why
 

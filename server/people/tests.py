@@ -147,6 +147,20 @@ class PublicPagesTests(TestCase):
         self.assertContains(page, 'href="/join/"')
         self.assertNotContains(page, 'name="password"')
 
+    def test_crawler_and_assistant_files(self):
+        robots = self.client.get("/robots.txt")
+        self.assertEqual(robots["Content-Type"], "text/plain; charset=utf-8")
+        self.assertContains(robots, "Sitemap: http://testserver/sitemap.xml")
+        self.assertContains(robots, "Disallow: /help/")  # personal pages stay out of search
+        sitemap = self.client.get("/sitemap.xml")
+        self.assertEqual(sitemap["Content-Type"], "application/xml; charset=utf-8")
+        for page in ("http://testserver/", "http://testserver/about/", "http://testserver/join/"):
+            self.assertContains(sitemap, f"<loc>{page}</loc>")
+        llms = self.client.get("/llms.txt")
+        self.assertContains(llms, "# Stelleye")
+        self.assertContains(llms, "eyes on call for visually impaired people")
+        self.assertContains(llms, "http://testserver/about/")
+
     def test_about_shows_the_problem_with_sources(self):
         page = self.client.get("/about/")
         self.assertEqual(page.status_code, 200)

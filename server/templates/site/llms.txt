@@ -1,0 +1,35 @@
+# Stelleye
+
+> Stelleye: eyes on call for visually impaired people, paid on Stellar worldwide. A visually impaired person taps one big button, or calls a guide they trust; a verified sighted guide video calls them on WhatsApp and describes what the camera sees. The budget is locked in USDC on Stellar before the call, the exact seconds are billed when it ends, the rest comes straight back, and the guide is paid the moment the call ends.
+
+Built for HackMeridian 2026 (Genesis category, Stellar Composed track). Runs on Stellar testnet.
+
+## Try it
+
+- [Live demo]({{ root }}/): open two windows and sign in from *Demo accounts* on the sign-in page. Ana (guide) taps *Go online*; Maria (caller) opens *Guides → Online now* and calls Ana. Kofi is a second guide.
+- [About: the problem]({{ root }}/about/): four referenced facts and a medicine label you can unblur.
+- [Sign up]({{ root }}/join/) as a caller or a guide; a Stellar wallet is created for you.
+
+## The problem
+
+Visual help today is costly, local and hard to pay across borders.
+
+- 2.2 billion people live with a vision impairment (WHO, 2026).
+- $26 a month buys 20 minutes of paid visual help in the US (Aira).
+- At 3 a.m. nearby helpers sleep, so help must come from abroad.
+- 6.49% to send $200 across borders, often taking days (World Bank, 2025).
+
+## How it uses Stellar
+
+- CallEscrow, a Soroban contract in Rust ({{ escrow }}): `open` locks the caller's budget; `close` bills per second from ledger time and refunds the rest; `confirm` pays the guide minus a 5% fee. A reviewer approves guides with `verify_guide`, and the contract refuses to lock money for unverified guides.
+- Circle's USDC through its Stellar Asset Contract ({{ token }}).
+- Add money and Cash out through a Stellar anchor (SEP-10 and SEP-24); production uses a licensed anchor such as MoneyGram Ramps.
+
+## Links
+
+- [Source code and README](https://github.com/Gastaan/Stelleye)
+- [CallEscrow on stellar.expert](https://stellar.expert/explorer/testnet/contract/{{ escrow }})
+
+## Team
+
+Saman Hazemijebelli, founder, full-stack and Soroban developer.

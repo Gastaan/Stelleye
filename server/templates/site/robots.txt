@@ -1,0 +1,14 @@
+# Stelleye: eyes on call for visually impaired people, paid on Stellar worldwide.
+User-agent: *
+Allow: /
+Disallow: /help/
+Disallow: /guide/
+Disallow: /review/
+Disallow: /wallet/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /demo-login/
+Disallow: /calls/
+Disallow: /me/
+
+Sitemap: {{ root }}/sitemap.xml
