@@ -84,8 +84,6 @@ def run_pair(pw, base: str, member_kind: str, guide_kind: str) -> list[str]:
         video_wait = 60_000 if "webkit" in (member_kind, guide_kind) else 30_000
         guide.wait_for_function("() => document.querySelector('#video-main').videoWidth > 0", timeout=video_wait)
         member.wait_for_function("() => document.querySelector('#video-pip').srcObject && document.querySelector('#video-pip').srcObject.getTracks().length > 0", timeout=video_wait)
-        expect(member.locator("[data-step='video']")).to_have_attribute("data-state", "done", timeout=15_000)
-        expect(guide.locator("[data-step='video']")).to_have_attribute("data-state", "done", timeout=15_000)
         elapsed = time.monotonic() - started
         guide_sees = guide.evaluate(STREAMS, "#video-main")
         member_hears = member.evaluate(STREAMS, "#video-pip")
@@ -102,6 +100,7 @@ def run_pair(pw, base: str, member_kind: str, guide_kind: str) -> list[str]:
         member.click("#ctl-end")
         expect(member.locator("#receipt")).to_be_visible(timeout=CHAIN)
         expect(guide.locator("#ended-view")).to_be_visible(timeout=15_000)
+        guide.click("#ended-ok")  # the summary sits in the online button's place until dismissed
         guide.click("#online-btn")
     except Exception as exc:  # noqa: BLE001 - report and move on to the next pair
         problems.append(f"{type(exc).__name__}: {str(exc).splitlines()[0]}")

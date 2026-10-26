@@ -218,8 +218,9 @@ const live = connectLive((msg) => {
     case "chat": stage.addMessage(msg); return;
     case "channel": stage.onChannel(msg); return;
     case "signal": stage.handleSignal(msg); return;
-    case "ending": stage.ending(msg.message); return;
+    case "ending": return onEnding(msg);
     case "ended": return onEnded(msg);
+    case "paid_out": return onPaidOut(msg);
     case "error": return onError(msg);
     default:
   }
@@ -243,6 +244,12 @@ function onStatus(msg) {
 
 function onError(msg) {
   vibrate(PATTERNS.error);
+  if (msg.code === "settle_failed" && lastCall?.call_id === msg.call_id) {
+    // The receipt is already open: keep it, and ask Stellar again shortly.
+    $("receipt-sub").textContent = "Stellar is slow right now. Trying again…";
+    setTimeout(() => live.send("hangup", { call_id: msg.call_id }), 3000);
+    return;
+  }
   const inCall = stage.active && ["matched", "live"].includes($("stage").dataset.state);
   if (inCall && msg.code !== "payment_failed") {
     announce(msg.message);
@@ -263,10 +270,6 @@ function onError(msg) {
 
 // ---- receipt ------------------------------------------------------------------------
 
-function timeOf(iso) {
-  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-}
-
 function setLink(id, url) {
   $(id).hidden = !url;
   $(id).href = url || "#";
@@ -279,48 +282,67 @@ function updateReceiptSave(peer) {
   $("r-avatar").style.setProperty("--hue", hue(peer.name));
   $("r-save-text").textContent = peer.saved
     ? `${peer.name} is in My guides. Call them directly next time.`
-    : `Did ${peer.name} help? Save them to call them again.`;
+    : `Save ${peer.name} to call them again.`;
   $("r-save-btn").setAttribute("aria-pressed", String(peer.saved));
   $("r-save-label").textContent = peer.saved ? "Saved" : `Save ${peer.name}`;
 }
 
-function onEnded(msg) {
+// The receipt opens the moment the call ends, with the length from the meter; Stellar settles the
+// amounts a few seconds later (onEnded), then pays the guide (onPaidOut). v1 has no hold or report step.
+function onEnding(msg) {
+  const peer = stage.view?.peer;
+  const seconds = stage.seconds;
   stage.close();
-  lastCall = msg;
+  lastCall = { call_id: msg.call_id, peer };
   tone("ended");
   vibrate(PATTERNS.ended);
   setHelpBusy(false);
   $("home-view").hidden = true;
+  $("receipt-heading").textContent = peer?.name ? `Call with ${peer.name} ended` : "Call ended";
+  $("receipt-sub").textContent = "Settling the payment on Stellar…";
+  $("r-duration").textContent = spokenDuration(seconds);
+  $("r-paid").textContent = "Settling…";
+  $("r-refund").textContent = "Settling…";
+  $("r-rows").setAttribute("aria-busy", "true");
+  for (const id of ["r-open-tx", "r-close-tx", "r-payout-tx"]) setLink(id, null);
+  updateReceiptSave(peer);
+  $("r-transcript").replaceChildren();
+  $("receipt").hidden = false;
+  $("receipt-heading").focus();
+  announce(`Call ended after ${spokenDuration(seconds)}. Settling the payment on Stellar.`);
+}
 
+function onEnded(msg) {
+  if (lastCall?.call_id !== msg.call_id) onEnding(msg); // e.g. the page reloaded while settling
+  stage.close();
+  lastCall = msg;
   const free = parseFloat(msg.earned) === 0;
   $("receipt-heading").textContent = msg.peer?.name ? `Call with ${msg.peer.name} ended` : "Call ended";
+  $("receipt-sub").textContent = free
+    ? "The call ended before it started. You were not charged."
+    : `Settled on Stellar. Paying ${msg.peer?.name || "your guide"}…`;
   $("r-duration").textContent = spokenDuration(msg.seconds);
   $("r-paid").textContent = `${msg.earned} ${asset}`;
   $("r-refund").textContent = `${msg.refunded} ${asset}`;
-  $("r-hold-row").hidden = !msg.hold_until;
-  if (msg.hold_until) $("r-hold").textContent = timeOf(msg.hold_until);
-  $("receipt-sub").textContent = free ? "The call ended before it started. You were not charged." : "Here is what happened with your money.";
+  $("r-rows").removeAttribute("aria-busy");
   setLink("r-open-tx", msg.open_tx_url);
   setLink("r-close-tx", msg.close_tx_url);
   setLink("r-payout-tx", msg.payout_tx_url);
-  $("confirm-btn").hidden = !msg.can_confirm;
-  $("report-open-btn").hidden = !msg.can_report;
-  $("report-form").hidden = true;
   updateReceiptSave(msg.peer);
   stage.chat.renderTranscript($("r-transcript"), msg.messages || []);
-  $("receipt").hidden = false;
-  $("receipt-heading").focus();
-
   announce(free
     ? "The call ended before it started. You were not charged."
-    : `The call lasted ${spokenDuration(msg.seconds)}. You paid ${msg.earned} ${asset}, and ${msg.refunded} ${asset} came back to your wallet. `
-      + `The guide's payment is held until ${timeOf(msg.hold_until)} in case you need to report a problem.`);
+    : `You paid ${msg.earned} ${asset}, and ${msg.refunded} ${asset} came back to your wallet.`);
   refresh();
 }
 
-function setBusy(button, busy) {
-  button.disabled = busy;
-  button.setAttribute("aria-busy", String(busy));
+function onPaidOut(msg) {
+  if (lastCall?.call_id !== msg.call_id) return;
+  const name = lastCall.peer?.name || "Your guide";
+  setLink("r-payout-tx", msg.payout_tx_url);
+  $("receipt-sub").textContent = `Settled on Stellar. ${name} has been paid.`;
+  announce(`${name} has been paid.`);
+  refresh();
 }
 
 $("r-save-btn").addEventListener("click", async () => {
@@ -328,48 +350,6 @@ $("r-save-btn").addEventListener("click", async () => {
   if (!peer) return;
   peer.saved = await setSaved(peer.id, !peer.saved);
   updateReceiptSave(peer);
-});
-
-$("confirm-btn").addEventListener("click", async () => {
-  const btn = $("confirm-btn");
-  setBusy(btn, true);
-  announce("Paying the guide on Stellar.");
-  try {
-    const data = await post(`/calls/${lastCall.call_id}/confirm/`);
-    btn.hidden = true;
-    $("report-open-btn").hidden = true;
-    $("r-hold-row").hidden = true;
-    setLink("r-payout-tx", data.payout_tx_url);
-    announce("Thank you. The guide has been paid.");
-    refresh();
-  } catch (err) {
-    announce(err.message);
-  } finally {
-    setBusy(btn, false);
-  }
-});
-
-$("report-open-btn").addEventListener("click", () => {
-  $("report-form").hidden = false;
-  $("report-reason").focus();
-});
-
-$("report-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const submit = e.submitter || $("report-form").querySelector("button");
-  setBusy(submit, true);
-  try {
-    await post(`/review/calls/${lastCall.call_id}/report/`, { reason: $("report-reason").value });
-    $("report-form").hidden = true;
-    $("confirm-btn").hidden = true;
-    $("report-open-btn").hidden = true;
-    announce("Report sent. The guide's payment is frozen and a person will review the call.");
-    refresh();
-  } catch (err) {
-    announce(err.message);
-  } finally {
-    setBusy(submit, false);
-  }
 });
 
 $("again-btn").addEventListener("click", () => {

@@ -2,7 +2,7 @@
 {% load static ui %}
 {% block title %}Get help · Stelleye{% endblock %}
 {% block account_href %}#account{% endblock %}
-{% block header_extra %}<a class="chip" href="#wallet" aria-label="Wallet, {{ balance }} {{ asset_code }}">{% icon "wallet" "sm" %}<span id="header-balance">{{ balance }}</span> {{ asset_code }}</a>{% endblock %}
+{% block header_extra %}<a class="chip" href="#wallet" aria-label="Wallet, {{ balance }} {{ asset_code }}">{% icon "wallet" "sm" %}<span id="header-balance">{{ balance }}</span><span class="chip__unit">&nbsp;{{ asset_code }}</span></a>{% endblock %}
 {% block content %}
 <div id="home-view" class="home">
   <header class="greet">
@@ -138,6 +138,7 @@
 
 {% include "calls/_stage.html" with role="member" %}
 
+{# Opens the moment a call ends; Stellar fills in the amounts, then the guide's payment, seconds later. #}
 <section id="receipt" class="card receipt" hidden aria-labelledby="receipt-heading">
   <div class="receipt__head">
     <span class="receipt__icon">{% icon "check" "lg" %}</span>
@@ -146,11 +147,10 @@
       <p class="muted" id="receipt-sub">Here is what happened with your money.</p>
     </div>
   </div>
-  <dl class="receipt__rows">
+  <dl class="receipt__rows" id="r-rows">
     <div><dt>Call length</dt><dd id="r-duration">–</dd></div>
     <div><dt>You paid</dt><dd id="r-paid">–</dd></div>
     <div><dt>Returned to your wallet</dt><dd id="r-refund">–</dd></div>
-    <div id="r-hold-row"><dt>Guide payment held until</dt><dd id="r-hold">–</dd></div>
   </dl>
 
   <div id="r-save" class="save-card" hidden>
@@ -158,16 +158,6 @@
     <p id="r-save-text" class="save-card__text"></p>
     <button id="r-save-btn" type="button" class="save-btn" aria-pressed="false">{% icon "heart" %}<span id="r-save-label">Save guide</span></button>
   </div>
-
-  <div class="actions actions--split">
-    <button id="confirm-btn" class="btn btn--success">{% icon "check" %}<span>Pay the guide now</span></button>
-    <button id="report-open-btn" class="btn btn--danger">{% icon "alert" %}<span>Report a problem</span></button>
-  </div>
-  <form id="report-form" class="field" hidden>
-    <label class="field-label" for="report-reason">What went wrong?</label>
-    <textarea id="report-reason" rows="3" required></textarea>
-    <button type="submit" class="btn btn--secondary">Send report</button>
-  </form>
 
   <ul class="tx-links" aria-label="Stellar transactions">
     <li><a id="r-open-tx" class="link-ext" href="#" target="_blank" rel="noopener">{% icon "lock" "sm" %}<span>Budget locked</span></a></li>

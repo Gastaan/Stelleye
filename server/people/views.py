@@ -37,7 +37,7 @@ class LoginPage(LoginView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if settings.DEBUG:
+        if settings.DEMO_ACCOUNTS:
             users = get_user_model().objects.select_related("profile").filter(username__in=DEMO_USERNAMES)
             context["demo_users"] = sorted(users, key=lambda u: DEMO_USERNAMES.index(u.username))
         return context
@@ -98,8 +98,8 @@ def set_whatsapp(request):
 
 @require_POST
 def demo_login(request, username):
-    """One-tap sign-in for the hackathon demo (DEBUG only)."""
-    if not settings.DEBUG:
+    """One-tap sign-in for the hackathon demo (development, or DEMO_ACCOUNTS=1 on the hosted demo)."""
+    if not settings.DEMO_ACCOUNTS:
         return redirect("login")
     user = get_object_or_404(get_user_model(), username=username)
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")

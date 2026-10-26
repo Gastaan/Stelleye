@@ -302,6 +302,11 @@ class LiveChannelTests(TransactionTestCase):
         # The guide is free again, and members see it.
         refreshed = await self._next(member_ws, "guides")
         self.assertEqual(refreshed["guides"][0]["state"], "available")
+        # v1 assumes the call helped: the guide is paid straight away, no hold to release by hand.
+        paid = await self._next(member_ws, "paid_out")
+        self.assertRegex(paid["payout_tx_url"], r"/confirm\d+$")  # released with the caller's key
+        self.assertEqual((await self._next(guide_ws, "paid_out"))["guide_share"], paid["guide_share"])
+        self.assertEqual(await database_sync_to_async(services.status_of)(call_id), S.RELEASED)
 
         await member_ws.disconnect()
         await guide_ws.disconnect()

@@ -209,7 +209,7 @@ def main() -> int:
         shot(member, "09-member-wa-calling")
         expect(guide.locator("#wa-confirm")).to_be_visible()
         guide.click("#wa-connected")
-        expect(member.locator("[data-step='video']")).to_have_attribute("data-state", "done", timeout=10_000)
+        expect(member.locator("#wa-title")).to_contain_text(f"On WhatsApp video with {guide_name}", timeout=10_000)
         expect(member.locator("#wa-title")).to_contain_text(f"On WhatsApp video with {guide_name}")
         check(True, "member sees the WhatsApp video call as connected")
 
@@ -257,7 +257,6 @@ def main() -> int:
             member.wait_for_function("() => { const v = document.querySelector('#video-pip'); return v && v.videoWidth > 0; }", timeout=30_000)
             check(video_playing(guide, "#video-main"), "guide sees the member's camera over WebRTC")
             check(video_playing(member, "#video-main"), "member sees their own camera preview")
-            expect(member.locator("[data-step='video']")).to_have_attribute("data-state", "done", timeout=15_000)
             shot(member, "11-member-inapp-video")
             shot(guide, "11-guide-inapp-video")
 
@@ -275,8 +274,12 @@ def main() -> int:
 
 
         step("Member ends the call: settled on Stellar, receipt")
+        hung_up = time.monotonic()
         member.click("#ctl-end")
-        expect(member.locator("#receipt")).to_be_visible(timeout=CHAIN)
+        expect(member.locator("#receipt")).to_be_visible(timeout=5_000)
+        opened = time.monotonic() - hung_up
+        check(opened < 3, f"receipt opened {opened:.1f}s after hanging up, before Stellar settles")
+        expect(member.locator("#r-paid")).not_to_have_text("Settling…", timeout=CHAIN)
         paid = member.locator("#r-paid").inner_text()
         refund = member.locator("#r-refund").inner_text()
         check(paid != "0.00 USDC", f"member paid {paid}, got back {refund}")
@@ -288,10 +291,11 @@ def main() -> int:
         expect(guide.locator("#ended-view")).to_be_visible(timeout=15_000)
         shot(guide, "12-guide-ended", full=True)
 
-        step("Member pays the guide now (releases the hold on-chain)")
-        member.click("#confirm-btn")
+        step("The guide is paid automatically when the call ends (v1: no hold)")
         expect(member.locator("#r-payout-tx")).to_be_visible(timeout=CHAIN)
-        check("/tx/" in (member.locator("#r-payout-tx").get_attribute("href") or ""), "payout transaction linked")
+        check("/tx/" in (member.locator("#r-payout-tx").get_attribute("href") or ""), "payout transaction linked, no extra step")
+        expect(guide.locator("#ended-text")).to_contain_text("is in your wallet", timeout=15_000)
+        check(guide.locator("#online-btn").is_hidden(), "guide's call summary sits in the online button's place")
         member.click("#again-btn")
         member.click("#tab-guides")
         saved = member.locator("#saved-list .guide", has_text=guide_name)

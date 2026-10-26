@@ -376,7 +376,9 @@ class LiveConsumer(AsyncJsonWebsocketConsumer):
                                   "message": "Ending the call as soon as the payment lock finishes. "
                                              "You will only pay for the seconds used."})
         elif status == S.ACTIVE:
-            await self._settle(call_id, ended_by=self.user.id)
+            # In the background: this consumer must stay free to deliver its own "ending" (the receipt
+            # opens at once) while Stellar settles and pays the guide.
+            asyncio.create_task(self._settle(call_id, ended_by=self.user.id))
 
     async def _cancel_ringing(self, call_id: int) -> None:
         guide_id = await db(services.cancel_ringing)(call_id, self.user.id)
@@ -412,3 +414,18 @@ class LiveConsumer(AsyncJsonWebsocketConsumer):
                                         "peer": view["peer"], "messages": view["messages"]})
         presence.set_busy(guide_id, False)
         await self._presence_changed()
+        if result["status"] == S.HELD:
+            await self._pay_guide(call_id, member_id, guide_id)
+
+    async def _pay_guide(self, call_id: int, member_id: int, guide_id: int) -> None:
+        """v1 assumes the call helped: release the guide's earnings at once, signed with the caller's key.
+        If this fails, the earnings stay held and the guide withdraws them after the hold."""
+        try:
+            paid = await chain(services.confirm_call)(call_id, member_id)
+        except Exception:  # noqa: BLE001
+            log.exception("paying the guide failed for call %s", call_id)
+            return
+        message = {"type": "paid_out", "call_id": call_id,
+                   "guide_share": paid["guide_share"], "payout_tx_url": paid["payout_tx_url"]}
+        await self.notify(member_id, message)
+        await self.notify(guide_id, message)

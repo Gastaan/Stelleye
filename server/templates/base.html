@@ -4,12 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#0369a1">
+  <meta name="theme-color" content="#f0953c">
   <meta name="description" content="Stelleye: live video help from sighted guides, paid by the minute in USDC on Stellar.">
   <title>{% block title %}Stelleye{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&display=swap">
+  <script>
+    // Light or dark before first paint: the person's choice from the header switch, else the system's.
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem("stelleye.theme"); } catch (e) { /* private mode */ }
+      var dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = dark ? "dark" : "light";
+    })();
+  </script>
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
   <link rel="icon" href="{% static 'img/stelleye-icon.svg' %}" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
@@ -25,16 +34,22 @@
     <div class="header-actions">
       {% if user.is_authenticated %}
         {% block header_extra %}{% endblock %}
-        {% if user.is_staff %}<a class="btn btn--ghost btn--sm" href="{% url 'review' %}">{% icon "scale" %}<span>Review</span></a>{% endif %}
-        {# Who is signed in; pages with an Account tab point the chip straight at it. #}
-        <a class="user-chip" href="{% block account_href %}{% url 'home' %}{% endblock %}">
-          <span class="user-chip__avatar" aria-hidden="true">{% if user.profile %}{{ user.profile.initials }}{% else %}{% icon "user" "sm" %}{% endif %}</span>
-          <span class="user-chip__name"><span class="visually-hidden">Signed in as </span>{% firstof user.profile.display_name user.get_username %}</span>
-        </a>
-        <form method="post" action="{% url 'logout' %}">
-          {% csrf_token %}
-          <button class="btn btn--ghost btn--sm" type="submit">{% icon "log-out" %}<span>Sign out</span></button>
-        </form>
+        {# Who is signed in; the chip opens a small menu (Account, Review, Sign out). #}
+        <div class="account-menu">
+          <button type="button" class="user-chip" id="account-btn" aria-expanded="false" aria-controls="account-panel">
+            <span class="user-chip__avatar" aria-hidden="true">{% if user.profile %}{{ user.profile.initials }}{% else %}{% icon "user" "sm" %}{% endif %}</span>
+            <span class="user-chip__name"><span class="visually-hidden">Signed in as </span>{% firstof user.profile.display_name user.get_username %}</span>
+            {% icon "chevron-down" "sm" %}
+          </button>
+          <div id="account-panel" class="account-menu__panel" hidden>
+            {% if user.profile %}<a class="menu-item" href="{% block account_href %}{% url 'home' %}{% endblock %}">{% icon "user" %}<span>Account</span></a>{% endif %}
+            {% if user.is_staff %}<a class="menu-item" href="{% url 'review' %}">{% icon "scale" %}<span>Review</span></a>{% endif %}
+            <form method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button class="menu-item" type="submit">{% icon "log-out" %}<span>Sign out</span></button>
+            </form>
+          </div>
+        </div>
       {% else %}
         {% block header_anon %}
           <nav class="site-nav" aria-label="Main">
@@ -43,6 +58,8 @@
           </nav>
         {% endblock %}
       {% endif %}
+      {# Light/dark: one standalone icon in the top-right corner for everyone. #}
+      <button type="button" class="icon-btn theme-btn" data-theme-toggle aria-pressed="false">{% include "ui/_theme_icons.html" %}<span class="visually-hidden">Dark mode</span></button>
     </div>
   </header>
 
@@ -68,6 +85,7 @@
     {% block content %}{% endblock %}
   </main>
 
+  <script type="module" src="{% static 'js/header.js' %}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

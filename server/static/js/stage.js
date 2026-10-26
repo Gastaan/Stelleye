@@ -96,6 +96,7 @@ export class CallStage {
 
   setStep(step, state) {
     const li = this.el.querySelector(`[data-step="${step}"]`);
+    if (!li) return; // the video step is not shown: the WhatsApp panel says when video is connected
     li.dataset.state = state;
     li.querySelector(".step__state").textContent = `, ${STEP_TEXT[state]}`;
   }

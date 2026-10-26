@@ -20,6 +20,7 @@ try { wantOnline = sessionStorage.getItem(ONLINE_KEY) === "1"; } catch { /* priv
 let incoming = null; // { callId }
 let lastClaimable = document.querySelectorAll(".claim-btn").length;
 let ringTimer = null;
+let endedCallId = null; // the call whose summary is showing
 
 function remember(online) {
   try { sessionStorage.setItem(ONLINE_KEY, online ? "1" : "0"); } catch { /* private mode */ }
@@ -76,11 +77,17 @@ const live = connectLive((msg) => {
     case "channel": stage.onChannel(msg); return;
     case "signal": stage.handleSignal(msg); return;
     case "status": announce(msg.message); return;
-    case "ending": stage.ending(msg.message); return;
+    case "ending": return onEnding(msg);
     case "ended": return onEnded(msg);
+    case "paid_out": return onPaidOut(msg);
     case "verified": return onVerified(msg);
     case "error":
       vibrate(PATTERNS.error);
+      if (msg.code === "settle_failed" && endedCallId === msg.call_id) {
+        $("ended-text").textContent = "Stellar is slow right now. Trying again…";
+        setTimeout(() => live.send("hangup", { call_id: msg.call_id }), 3000);
+        return;
+      }
       $("online-btn").removeAttribute("aria-busy");
       $("accept-btn").removeAttribute("aria-busy");
       if (msg.code === "whatsapp_missing") {
@@ -145,21 +152,48 @@ function stopRinging() {
   ringTimer = null;
 }
 
-function onEnded(msg) {
+// The summary appears in the online button's place the moment the call ends; Stellar settles it
+// (onEnded) and pays the guide (onPaidOut) a few seconds later.
+function onEnding(msg) {
+  const name = stage.view?.peer?.name || "the caller";
+  const seconds = stage.seconds;
   stage.close();
+  endedCallId = msg.call_id;
   $("home-view").hidden = false;
-  tone("ended");
-  const until = msg.hold_until
-    ? ` You can withdraw it after ${new Date(msg.hold_until).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}.`
-    : "";
-  const text = `The call with ${msg.peer?.name || "the caller"} lasted ${spokenDuration(msg.seconds)}. You earned ${msg.guide_share} ${asset}.${until}`;
-  $("ended-text").textContent = text;
-  $("ended-tx").href = msg.close_tx_url || "#";
   tabs.show("calls");
+  tone("ended");
+  $("ended-text").textContent = `The call with ${name} lasted ${spokenDuration(seconds)}. Settling your earnings on Stellar…`;
+  $("ended-tx").hidden = true;
+  $("incoming-view").hidden = true;
   $("ended-view").hidden = false;
   $("ended-heading").focus();
+  announce(`Call ended. Settling your earnings on Stellar.`);
+}
+
+function onEnded(msg) {
+  if (endedCallId !== msg.call_id) onEnding(msg);
+  const text = parseFloat(msg.earned) === 0
+    ? `The call with ${msg.peer?.name || "the caller"} ended before it started.`
+    : `The call with ${msg.peer?.name || "the caller"} lasted ${spokenDuration(msg.seconds)}. You earned ${msg.guide_share} ${asset}. Paying it into your wallet…`;
+  $("ended-text").textContent = text;
+  setEndedLink(msg.close_tx_url, "See the settlement on Stellar");
   announce(text);
   refresh();
+}
+
+function onPaidOut(msg) {
+  if (endedCallId !== msg.call_id) return;
+  const text = `${msg.guide_share} ${asset} is in your wallet.`;
+  $("ended-text").textContent = $("ended-text").textContent.replace(/Paying it into your wallet…$/, text);
+  setEndedLink(msg.payout_tx_url, "See the payment on Stellar");
+  announce(`Paid. ${text}`);
+  refresh();
+}
+
+function setEndedLink(url, label) {
+  $("ended-tx").hidden = !url;
+  $("ended-tx").href = url || "#";
+  $("ended-tx-label").textContent = label;
 }
 
 // ---- buttons ------------------------------------------------------------------
@@ -188,6 +222,7 @@ $("decline-btn").addEventListener("click", () => {
 
 $("ended-ok").addEventListener("click", () => {
   $("ended-view").hidden = true;
+  endedCallId = null;
   $("home-title").focus();
 });
 
@@ -242,8 +277,10 @@ async function refresh() {
   try {
     const data = await getJSON("/api/me/");
     $("balance").textContent = data.balance;
-    $("stat-ready").textContent = data.totals.ready;
-    $("stat-held").textContent = data.totals.held;
+    for (const [id, value] of [["stat-ready", data.totals.ready], ["stat-held", data.totals.held]]) {
+      $(id).textContent = value;
+      $(id).closest(".stat").hidden = value === "0.00"; // only older calls still wait for a hold
+    }
     if (data.calls.length) $("earnings-list").replaceChildren(...data.calls.map(row));
     // Something new to withdraw: unfold the history so the Withdraw button is in reach.
     const claimable = data.calls.filter((call) => call.can_claim).length;

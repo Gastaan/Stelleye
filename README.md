@@ -9,11 +9,14 @@
 
 **Live video help from sighted guides for blind and low-vision people, paid by the minute in USDC on Stellar.**
 
+**Try it live (Stellar testnet):** https://samanhazemijebelli--stelleye.us-east.modal.run. Sign in, open
+*Demo accounts*, and use Maria (caller) in one browser and Ana or Kofi (guide) in another.
+
 A blind person taps one big button (or picks a guide they trust). A verified guide video calls them
 on WhatsApp and describes what the camera sees: a medicine label, the right bus, a form. The
 caller's budget is locked in a Soroban smart contract before the call starts; when either side hangs
-up, the contract bills the exact seconds used from ledger time, refunds the rest instantly, and holds
-the guide's earnings briefly so the caller can report a problem before they are released.
+up, the contract bills the exact seconds used from ledger time, refunds the rest instantly, and pays
+the guide straight away.
 
 Money moves on real rails: callers **Add money** by card or bank transfer and guides **Cash out** to a
 bank through a Stellar anchor (SEP-24), in Circle's USDC. On testnet that is Stellar's test anchor and
@@ -32,11 +35,11 @@ Built for **HackMeridian 2026** (Genesis category, Stellar Unlocked track).
 1. **Join and add money.** Choose *I need visual help* or *I want to be a guide*. Stelleye creates a Stellar wallet for you (no seed phrase to manage). Callers press *Add money*: the anchor's secure page opens in a new tab for the card or bank step, and Stelleye announces "Added 9.00 USDC" when the money arrives.
 2. **Guides are verified.** A reviewer approves each guide, and the approval is written to the guide registry inside the `CallEscrow` contract. The guide's page unlocks by itself.
 3. **Choose.** Callers see guides online right now (saved guides first, then cheapest, with languages and rates), or press *Get help now* for the first available.
-4. **Match → chat → payment lock.** When the guide accepts, a chat opens for both. The caller's budget is locked on-chain (`open`), and a progress row shows *Guide found → Payment locked → Video connected*.
+4. **Match → chat → payment lock.** When the guide accepts, a chat opens for both. The caller's budget is locked on-chain (`open`), and a progress row shows *Guide found → Payment locked*.
 5. **Video on WhatsApp.** The guide taps *Video call on WhatsApp* (on a Mac this opens the WhatsApp app, since WhatsApp Web cannot call). The caller hears *"Ana is calling you on WhatsApp now, answer the call"* and only has to answer. Stelleye keeps the meter and chat running, welcomes the caller back, and asks the guide to confirm the call connected.
 6. **WhatsApp only.** WhatsApp is the one video channel. If the call does not connect, the guide taps *Could not connect* and tries again; the caller can message the guide from the call screen. (An in-app WebRTC video mode exists for testing only, switched on with `INAPP_VIDEO_TEST_MODE=1`.)
-7. **Settle.** Either side ends the call (`close`): exact seconds billed, the rest refunded at once, earnings held.
-8. **Receipt.** The caller can *Pay the guide now* (`confirm`), *Report a problem* (`report`, which freezes the funds for a human reviewer who splits them with `resolve`), and *Save* the guide to call them directly next time. Guides *Withdraw* after the hold (`claim`).
+7. **Settle and pay.** Either side ends the call and the receipt opens at once; Stellar fills in the amounts seconds later (`close`: exact seconds billed, the rest refunded). v1 assumes the call helped, so Stelleye then releases the guide's earnings straight away (`confirm`, signed with the caller's custodial key) and both sides see the payment land.
+8. **Receipt.** The caller sees what they paid and got back, every transaction, the chat, and can *Save* the guide to call them directly next time. The contract also supports a hold with *Report a problem* (`report`, then a reviewer's `resolve`) and late withdrawal (`claim`); v1 does not use them.
 9. **Cash out.** Guides enter bank details on the anchor's page, then confirm in Stelleye ("send 3.00 USDC, you receive 2.70 USD"). Only then does Stelleye pay the anchor, once, and track it to "Sent to your bank".
 
 ## Stellar integration
@@ -52,7 +55,8 @@ Built for **HackMeridian 2026** (Genesis category, Stellar Unlocked track).
 
 Contract lifecycle: `verify_guide` / `revoke_guide` (on-chain registry) → `open` (lock the budget) →
 `close` (per-second billing from ledger time, rounded up, capped at the budget; instant refund;
-earnings held) → `confirm` (release early) | `report` → `resolve` (reviewer split) | `claim` (after the hold).
+earnings held) → `confirm` (v1 calls it right after `close`, paying the guide at once) | `report` → `resolve`
+(reviewer split) | `claim` (after the hold); the last two are kept for a later version with disputes.
 A 5% platform fee is taken only on what the guide receives. Every transaction is linked from the UI to
 stellar.expert.
 
@@ -124,14 +128,30 @@ WEBRTC_ICE_SERVERS='[{"urls":"stun:stun.l.google.com:19302"},{"urls":["turn:glob
 ```
 For phones, serve over HTTPS (for example with a tunnel).
 
+## Deploy on Modal
+
+`modal_app.py` serves the Django ASGI app (pages, API and the live WebSocket) from one always-warm
+container: presence and the call channel live in that process's memory. WebSockets stay open for up to
+24 hours, and the SQLite database runs on the container's disk with a consistent copy saved to a Modal
+Volume every few seconds and on shutdown, then restored on start.
+
+```bash
+modal volume create stelleye-data
+modal volume put stelleye-data server/db.sqlite3 /db.sqlite3     # optional: start from an existing database
+modal secret create stelleye-env --from-dotenv server/.env DJANGO_SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')"
+modal deploy modal_app.py
+server/.venv/bin/python server/e2e/live_check.py --base https://<workspace>--stelleye.us-east.modal.run   # a real call
+```
+
 ## Tests
 
 ```bash
 cd server
 uv pip install --group dev -r pyproject.toml && .venv/bin/python -m playwright install chromium webkit
-.venv/bin/python manage.py test                 # 46 unit tests, no network (fake escrow and fake anchor)
+.venv/bin/python manage.py test                 # 51 unit tests, no network (fake escrow and fake anchor)
 .venv/bin/python e2e/run_e2e.py                 # full journey on testnet: 3 browsers, fake camera, axe scans
 .venv/bin/python e2e/run_money.py               # real-money rails: Add money and Cash out through the test anchor
+.venv/bin/python e2e/responsive_sweep.py        # every page on laptops, iPad and phones, light and dark, axe
 INAPP_VIDEO_TEST_MODE=1 .venv/bin/python manage.py runserver 8000 --nostatic   # then, for the test-only in-app video:
 .venv/bin/python e2e/video_matrix.py            # Mac matrix: Safari engine (WebKit) and Chrome, every pairing
 cd ../contracts && cargo test                   # 11 contract tests

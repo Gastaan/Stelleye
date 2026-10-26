@@ -10,7 +10,7 @@
       <h1 id="home-title" tabindex="-1">Be someone's eyes today</h1>
       <span class="tip">
         <button type="button" class="tip__btn" aria-expanded="false" aria-controls="tip-earning">{% icon "help-circle" %}<span class="visually-hidden">How you are paid</span></button>
-        <span id="tip-earning" class="tip__panel" hidden>You earn {{ profile.rate_per_minute }} {{ asset_code }} a minute, settled on Stellar. Earnings are held for {{ hold_label }} after each call so the caller can report a problem; then you can withdraw them.</span>
+        <span id="tip-earning" class="tip__panel" hidden>You earn {{ profile.rate_per_minute }} {{ asset_code }} a minute. When a call ends, Stellar settles it and pays you straight into your wallet.</span>
       </span>
     </div>
   </header>
@@ -37,16 +37,7 @@
     </div>
   </section>
 
-  {# One big tap button: pressed means online and taking calls. #}
-  <div class="help">
-    <button id="online-btn" class="help-orb power-orb" aria-pressed="false" {% if not profile.is_verified %}disabled{% endif %}>
-      <span class="help-orb__icon">{% icon "power" "xl" %}</span>
-      <span class="help-orb__label" id="online-label">Go online</span>
-      <span class="help-orb__sub" id="online-sub">{% if profile.is_verified %}Tap to take calls{% else %}Waiting for verification{% endif %}</span>
-    </button>
-    <p id="verified-line" class="verified-line" {% if not profile.is_verified %}hidden{% endif %}>{% icon "shield-check" "sm" %} Verified guide on Stellar</p>
-  </div>
-
+  {# A call takes the online button's place: incoming, then the summary once it ends. #}
   <section id="incoming-view" class="card incoming" hidden aria-labelledby="incoming-heading">
     <span class="incoming__ring" aria-hidden="true"><span class="avatar avatar--lg" id="incoming-avatar"></span></span>
     <h2 id="incoming-heading" tabindex="-1">Incoming call</h2>
@@ -66,10 +57,19 @@
         <p id="ended-text" class="muted"></p>
       </div>
     </div>
-    <a id="ended-tx" class="link-ext" href="#" target="_blank" rel="noopener">{% icon "external" "sm" %}<span>See the settlement on Stellar</span></a>
+    <a id="ended-tx" class="link-ext" href="#" target="_blank" rel="noopener" hidden>{% icon "external" "sm" %}<span id="ended-tx-label">See the settlement on Stellar</span></a>
     <button id="ended-ok" class="btn btn--secondary btn--block">Done</button>
   </section>
 
+  {# One big tap button: pressed means online and taking calls. #}
+  <div class="help">
+    <button id="online-btn" class="help-orb power-orb" aria-pressed="false" {% if not profile.is_verified %}disabled{% endif %}>
+      <span class="help-orb__icon">{% icon "power" "xl" %}</span>
+      <span class="help-orb__label" id="online-label">Go online</span>
+      <span class="help-orb__sub" id="online-sub">{% if profile.is_verified %}Tap to take calls{% else %}Waiting for verification{% endif %}</span>
+    </button>
+    <p id="verified-line" class="verified-line" {% if not profile.is_verified %}hidden{% endif %}>{% icon "shield-check" "sm" %} Verified guide on Stellar</p>
+  </div>
   </section>
 
   <section id="panel-earnings" class="tabpanel" role="tabpanel" aria-labelledby="tab-earnings" tabindex="0" hidden>
@@ -80,8 +80,9 @@
     </div>
     <div class="stats">
       <div class="stat"><span class="stat__label">{% icon "wallet" "sm" %} In your wallet</span><span class="stat__value"><span id="balance">{{ balance }}</span> <small class="muted">{{ asset_code }}</small></span></div>
-      <div class="stat"><span class="stat__label">{% icon "download" "sm" %} Ready to withdraw</span><span class="stat__value" id="stat-ready">{{ totals.ready }}</span></div>
-      <div class="stat"><span class="stat__label">{% icon "clock" "sm" %} On hold</span><span class="stat__value" id="stat-held">{{ totals.held }}</span></div>
+      {# With instant payout these are only for older calls, so they show only when not zero. #}
+      <div class="stat" {% if totals.ready == "0.00" %}hidden{% endif %}><span class="stat__label">{% icon "download" "sm" %} Ready to withdraw</span><span class="stat__value" id="stat-ready">{{ totals.ready }}</span></div>
+      <div class="stat" {% if totals.held == "0.00" %}hidden{% endif %}><span class="stat__label">{% icon "clock" "sm" %} On hold</span><span class="stat__value" id="stat-held">{{ totals.held }}</span></div>
     </div>
     <div class="money" role="group" aria-labelledby="cashout-label">
       <div class="title-row">

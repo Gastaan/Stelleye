@@ -74,14 +74,6 @@ def _guide_totals(calls: list[dict]) -> dict:
     return {"ready": display(ready), "held": display(held)}
 
 
-def _hold_label(seconds: int) -> str:
-    if seconds >= 3600:
-        hours = round(seconds / 3600)
-        return f"{hours} hour{'s' if hours != 1 else ''}"
-    minutes = max(1, round(seconds / 60))
-    return f"{minutes} minute{'s' if minutes != 1 else ''}"
-
-
 def _wallet_context(user) -> dict:
     cfg = get_config()
     try:
@@ -122,7 +114,6 @@ def guide_home(request):
         **_wallet_context(request.user),
         "calls": calls,
         "totals": _guide_totals(calls),
-        "hold_label": _hold_label(get_config().hold_seconds),
     })
 
 

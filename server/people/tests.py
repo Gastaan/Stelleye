@@ -154,3 +154,16 @@ class PublicPagesTests(TestCase):
         self.assertRedirects(self.client.get("/"), "/help/", fetch_redirect_response=False)
         self.client.post("/logout/")
         self.assertEqual(self.client.get("/").status_code, 200)
+
+    @mock.patch("calls.views.wallets.balance_of", return_value=Decimal("12.5"))
+    def test_signed_in_header_names_the_person_and_offers_no_sign_up(self, _balance):
+        for username, role, home in (("maria", Profile.Role.MEMBER, "/help/"), ("ana", Profile.Role.GUIDE, "/guide/")):
+            person = make_person(username, role)
+            self.client.force_login(person.user)
+            page = self.client.get(home)
+            self.assertContains(page, f"Signed in as </span>{person.display_name}")
+            self.assertContains(page, 'href="#account"')  # the menu's Account opens the tab on this page
+            self.assertNotContains(page, 'href="/join/"')
+            self.assertNotContains(page, 'href="/login/"')
+            self.assertRedirects(self.client.get("/join/"), "/", fetch_redirect_response=False)
+            self.client.post("/logout/")
