@@ -1,0 +1,16 @@
+[project]
+name = "sightline-server"
+version = "0.1.0"
+description = "Stelleye: pay-per-minute video guidance for blind users, settled on Stellar"
+requires-python = ">=3.11"
+dependencies = [
+    "django==5.2.18",
+    "channels==4.3.2",
+    "daphne==4.2.3",
+    "stellar-sdk==16.1.1",
+    "python-dotenv==1.1.1",
+]
+
+[dependency-groups]
+# End-to-end and accessibility checks (server/e2e/); axe-core and simple-peer are vendored.
+dev = ["playwright==1.55.0"]

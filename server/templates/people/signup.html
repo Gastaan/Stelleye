@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Create an account · Stelleye{% endblock %}
+{% block header_anon %}<nav class="site-nav" aria-label="Main"><a class="btn btn--ghost btn--sm" href="{% url 'login' %}">{% icon "log-in" %}<span>Sign in</span></a></nav>{% endblock %}
+{% block content %}
+<header class="page-head">
+  <h1 id="signup-title" tabindex="-1">Create your account</h1>
+  <p class="muted">It takes a minute. We also create your own Stellar wallet, so there is nothing else to install.</p>
+</header>
+
+{% if form.errors or wallet_error %}
+  <div id="error-summary" class="error-summary" role="alert" tabindex="-1" aria-labelledby="error-summary-title">
+    <h2 id="error-summary-title">{% icon "alert" %} There is a problem</h2>
+    <ul>
+      {% if wallet_error %}<li>We could not create your wallet: {{ wallet_error }} Please try again.</li>{% endif %}
+      {% for field in form %}{% for error in field.errors %}<li><a href="#id_{{ field.name }}{% if field.name == 'role' %}_member{% elif field.name == 'languages' %}_{{ languages.0.0 }}{% endif %}">{{ error }}</a></li>{% endfor %}{% endfor %}
+      {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<form id="signup-form" method="post" class="form-stack" novalidate>
+  {% csrf_token %}
+  <fieldset class="role-pick">
+    <legend class="field-label">How will you use Stelleye?</legend>
+    {% if form.role.errors %}<p class="form-error" id="role-error">{{ form.role.errors.0 }}</p>{% endif %}
+    <label class="role-card" for="id_role_member">
+      <input type="radio" id="id_role_member" name="role" value="member" {% if form.role.value == "member" %}checked{% endif %} {% if form.role.errors %}aria-describedby="role-error"{% endif %}>
+      <span class="role-card__icon" aria-hidden="true">{% icon "eye" "lg" %}</span>
+      <span class="role-card__text">
+        <span class="role-card__title">I need visual help</span>
+        <span class="role-card__sub">I am blind or have low vision. Add money by card or bank transfer, pay only for the minutes you use.</span>
+      </span>
+    </label>
+    <label class="role-card" for="id_role_guide">
+      <input type="radio" id="id_role_guide" name="role" value="guide" {% if form.role.value == "guide" %}checked{% endif %}>
+      <span class="role-card__icon" aria-hidden="true">{% icon "headphones" "lg" %}</span>
+      <span class="role-card__text">
+        <span class="role-card__title">I want to be a guide</span>
+        <span class="role-card__sub">I am sighted and will describe what I see. I am paid per minute in {{ asset_code }}.</span>
+      </span>
+    </label>
+  </fieldset>
+
+  <div class="field">
+    <div class="title-row">
+      <label class="field-label" for="id_display_name">Your first name</label>
+      <span class="tip">
+        <button type="button" class="tip__btn" aria-expanded="false" aria-controls="name-hint">{% icon "help-circle" %}<span class="visually-hidden">About your name</span></button>
+        <span id="name-hint" class="tip__panel" hidden>People you call see this name.</span>
+      </span>
+    </div>
+    <input id="id_display_name" name="display_name" autocomplete="given-name" value="{{ form.display_name.value|default:'' }}" required
+           aria-describedby="name-hint{% if form.display_name.errors %} name-error{% endif %}" {% if form.display_name.errors %}aria-invalid="true"{% endif %}>
+    {% if form.display_name.errors %}<p class="form-error" id="name-error">{{ form.display_name.errors.0 }}</p>{% endif %}
+  </div>
+
+  <div class="field">
+    <div class="title-row">
+      <label class="field-label" for="id_username">Username</label>
+      <span class="tip">
+        <button type="button" class="tip__btn" aria-expanded="false" aria-controls="username-hint">{% icon "help-circle" %}<span class="visually-hidden">About your username</span></button>
+        <span id="username-hint" class="tip__panel" hidden>For signing in. Letters, numbers and . _ - only.</span>
+      </span>
+    </div>
+    <input id="id_username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" value="{{ form.username.value|default:'' }}" required
+           aria-describedby="username-hint{% if form.username.errors %} username-error{% endif %}" {% if form.username.errors %}aria-invalid="true"{% endif %}>
+    {% if form.username.errors %}<p class="form-error" id="username-error">{{ form.username.errors.0 }}</p>{% endif %}
+  </div>
+
+  <div class="field">
+    <div class="title-row">
+      <label class="field-label" for="id_password">Password</label>
+      <span class="tip">
+        <button type="button" class="tip__btn" aria-expanded="false" aria-controls="password-hint">{% icon "help-circle" %}<span class="visually-hidden">About your password</span></button>
+        <span id="password-hint" class="tip__panel" hidden>At least 6 characters. Your password manager can fill this in.</span>
+      </span>
+    </div>
+    <div class="password">
+      <input id="id_password" name="password" type="password" autocomplete="new-password" required
+             aria-describedby="password-hint{% if form.password.errors %} password-error{% endif %}" {% if form.password.errors %}aria-invalid="true"{% endif %}>
+      <button type="button" class="btn btn--ghost btn--sm password__toggle" id="password-toggle" aria-pressed="false" aria-controls="id_password">{% icon "eye" %}<span>Show</span></button>
+    </div>
+    {% if form.password.errors %}<p class="form-error" id="password-error">{{ form.password.errors.0 }}</p>{% endif %}
+  </div>
+
+  <div class="field">
+    <div class="title-row">
+      <label class="field-label" for="id_whatsapp">WhatsApp number</label>
+      <span class="tip">
+        <button type="button" class="tip__btn" aria-expanded="false" aria-controls="whatsapp-hint">{% icon "help-circle" %}<span class="visually-hidden">Why we need your WhatsApp number</span></button>
+        <span id="whatsapp-hint" class="tip__panel" hidden>The video call happens on WhatsApp: guides call the person they help. Include the country code. It is shared only with the person you are matched with.</span>
+      </span>
+    </div>
+    <input id="id_whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="+34 600 111 222" value="{{ form.whatsapp.value|default:'' }}" required
+           aria-describedby="whatsapp-hint{% if form.whatsapp.errors %} whatsapp-error{% endif %}" {% if form.whatsapp.errors %}aria-invalid="true"{% endif %}>
+    {% if form.whatsapp.errors %}<p class="form-error" id="whatsapp-error">{{ form.whatsapp.errors.0 }}</p>{% endif %}
+  </div>
+
+  <fieldset class="field chips">
+    <legend class="field-label">Languages you speak</legend>
+    {% if form.languages.errors %}<p class="form-error" id="languages-error">{{ form.languages.errors.0 }}</p>{% endif %}
+    <div class="chips__grid">
+      {% for code, name in languages %}
+        <label class="chip-check" for="id_languages_{{ code }}"><input type="checkbox" id="id_languages_{{ code }}" name="languages" value="{{ code }}" {% if code in chosen_languages %}checked{% endif %}><span>{{ name }}</span></label>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <div class="field">
+    <label class="field-label" for="id_city">City <span class="optional">(optional)</span></label>
+    <input id="id_city" name="city" autocomplete="address-level2" value="{{ form.city.value|default:'' }}">
+  </div>
+
+  <div class="field" id="rate-field">
+    <div class="title-row">
+      <label class="field-label" for="id_rate">Your rate per minute ({{ asset_code }})</label>
+      <span class="tip">
+        <button type="button" class="tip__btn" aria-expanded="false" aria-controls="rate-hint">{% icon "help-circle" %}<span class="visually-hidden">About your rate</span></button>
+        <span id="rate-hint" class="tip__panel" hidden>Between 0.05 and 2.00. Most guides start at 0.20.</span>
+      </span>
+    </div>
+    <input id="id_rate" name="rate" type="number" inputmode="decimal" min="0.05" max="2" step="0.01" value="{{ form.rate.value|default:'0.20' }}"
+           aria-describedby="rate-hint{% if form.rate.errors %} rate-error{% endif %}" {% if form.rate.errors %}aria-invalid="true"{% endif %}>
+    {% if form.rate.errors %}<p class="form-error" id="rate-error">{{ form.rate.errors.0 }}</p>{% endif %}
+  </div>
+
+  <button id="signup-submit" type="submit" class="btn btn--primary btn--lg btn--block">{% icon "user-plus" %}<span id="signup-label">Create account and wallet</span></button>
+  <p id="signup-progress" class="progress-note" hidden>{% icon "lock" "sm" %}<span>Creating your Stellar wallet on testnet. This takes about 15 seconds.</span></p>
+  <p class="muted center">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+</form>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'js/signup.js' %}"></script>{% endblock %}

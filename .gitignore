@@ -1,0 +1,55 @@
+# Rust / Soroban
+contracts/target/
+contracts/**/test_snapshots/
+*.wasm
+
+# Python / Django
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.sqlite3
+server/media/
+server/staticfiles/
+
+# Secrets and generated config (keep only the examples)
+.env
+.env.*
+!.env.example
+server/.env
+scripts/testnet.json
+*.pem
+*.key
+
+# End-to-end run output
+server/e2e/artifacts/
+test-results/
+playwright-report/
+
+# Node (if any tooling is added)
+node_modules/
+
+# Logs
+*.log
+
+# Local tooling and working notes (not part of the app)
+.claude/
+design-system/
+docs/hackmeridian-submission.md
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~

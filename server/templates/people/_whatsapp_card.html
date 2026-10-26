@@ -1,0 +1,17 @@
+{% load ui %}
+<details class="card {% if not profile.whatsapp %}card--notice{% endif %}" id="whatsapp-card" {% if not profile.whatsapp %}open{% endif %}>
+  <summary>{% icon "phone" %} <span id="wa-heading">{% if profile.whatsapp %}Your WhatsApp: {{ profile.whatsapp_display }}{% else %}Add your WhatsApp number{% endif %}</span></summary>
+  <form id="whatsapp-form" class="field" novalidate>
+    <div class="title-row">
+      <label class="field-label" for="whatsapp-input">WhatsApp number with country code</label>
+      <span class="tip">
+        <button type="button" class="tip__btn" aria-expanded="false" aria-controls="wa-help">{% icon "help-circle" %}<span class="visually-hidden">Why we need your WhatsApp number</span></button>
+        <span id="wa-help" class="tip__panel" hidden>{{ help_text }} Your number is shared only with the person you are matched with, and only after the call is accepted.</span>
+      </span>
+    </div>
+    <input id="whatsapp-input" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="+34 600 111 222"
+           value="{{ profile.whatsapp_display }}" aria-describedby="wa-help wa-error" required>
+    <p id="wa-error" class="form-error" role="alert" hidden></p>
+    <button type="submit" class="btn btn--secondary">{% icon "check" %}<span>Save number</span></button>
+  </form>
+</details>

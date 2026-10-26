@@ -1,0 +1,83 @@
+{% load ui %}
+{% comment %}The call stage both roles share; driven by static/js/stage.js.
+   data-channel: "whatsapp" (the video call happens in WhatsApp; the only channel in the product) or
+   "inapp" (WebRTC video, rendered only when INAPP_VIDEO_TEST_MODE=1 for tests).{% endcomment %}
+<section id="stage" class="stage" data-state="calling" data-channel="whatsapp" data-chat="none" data-chat-open="false" hidden aria-labelledby="stage-title">
+  <header class="stage__top">
+    <span class="avatar avatar--stage" id="stage-avatar" aria-hidden="true">{% icon "headphones" %}</span>
+    <div class="stage__heading">
+      <h2 id="stage-title" tabindex="-1">Finding a guide</h2>
+      <p id="stage-sub" class="stage__sub"></p>
+    </div>
+    {% if role == "member" %}
+      <button id="save-peer" type="button" class="save-btn" aria-pressed="false" hidden>{% icon "heart" %}<span id="save-peer-label">Save guide</span></button>
+    {% endif %}
+  </header>
+
+  <ol class="steps" aria-label="Call progress">
+    <li class="step" data-step="match" data-state="doing"><span class="step__dot" aria-hidden="true"></span><span>{% if role == "member" %}Guide found{% else %}Accepted{% endif %}</span><span class="visually-hidden step__state"></span></li>
+    <li class="step" data-step="pay" data-state="todo"><span class="step__dot" aria-hidden="true"></span><span>Payment locked</span><span class="visually-hidden step__state"></span></li>
+    <li class="step" data-step="video" data-state="todo"><span class="step__dot" aria-hidden="true"></span><span>Video connected</span><span class="visually-hidden step__state"></span></li>
+  </ol>
+
+  <div class="stage__body">
+    <div class="stage__media">
+      <div id="wa-panel" class="wa-stage" hidden>
+        <span class="wa-stage__icon" aria-hidden="true">{% icon "video" "xl" %}</span>
+        <h3 id="wa-title" class="wa-stage__title"></h3>
+        <p id="wa-text" class="wa-stage__text"></p>
+        <a id="wa-open" class="btn btn--whatsapp btn--lg" href="#" target="_blank" rel="noopener">{% icon "phone" %}<span id="wa-open-label">Open WhatsApp</span></a>
+        <div id="wa-confirm" class="actions actions--split wa-stage__confirm" hidden>
+          <button id="wa-connected" type="button" class="btn btn--success">{% icon "check" %}<span>Video call connected</span></button>
+          <button id="wa-failed" type="button" class="btn btn--secondary">{% icon "x" %}<span>Could not connect</span></button>
+        </div>
+        <p id="wa-number" class="wa-stage__number"></p>
+        <p id="wa-hint" class="wa-stage__hint" hidden>Opens the WhatsApp app on this computer. WhatsApp Web cannot make calls, so <a href="https://www.whatsapp.com/download" target="_blank" rel="noopener">get WhatsApp for Mac or Windows</a> if it is not installed.</p>
+      </div>
+      <video id="video-main" class="stage__video" playsinline autoplay muted {% if role == "guide" %}aria-label="The caller's camera"{% endif %}></video>
+      <div id="stage-placeholder" class="stage__placeholder">
+        <span class="pulse" aria-hidden="true">{% if role == "member" %}{% icon "camera" "xl" %}{% else %}{% icon "shield-check" "xl" %}{% endif %}</span>
+        <p id="stage-placeholder-text"></p>
+      </div>
+      <video id="video-pip" class="stage__pip" playsinline autoplay hidden {% if role == "member" %}aria-label="Your guide's camera"{% endif %}></video>
+      <div class="stage__hud">
+        <span id="stage-badge" class="badge badge--info"><span>Not charged yet</span></span>
+        <span id="meter" class="meter" hidden><span id="meter-time" class="meter__time">00:00</span><span id="meter-cost" class="meter__cost"></span></span>
+      </div>
+      <p id="video-note" class="stage__note" hidden></p>
+      <button id="play-remote" type="button" class="btn btn--primary stage__play" hidden>{% icon "volume" %}<span>Turn on sound</span></button>
+    </div>
+
+    <aside id="chat" class="chat" aria-labelledby="chat-title">
+      <h3 id="chat-title" class="chat__title" data-chat-title>Chat</h3>
+      <ol class="chat__log" data-chat-log aria-label="Messages"></ol>
+      <div class="chat__quick" data-chat-quick role="group" aria-label="Quick replies"></div>
+      <form class="chat__form" data-chat-form>
+        <label class="visually-hidden" for="chat-input">Message</label>
+        <input id="chat-input" data-chat-input autocomplete="off" maxlength="500" placeholder="Type a message" enterkeyhint="send">
+        <button type="submit" class="icon-btn icon-btn--send" aria-label="Send message">{% icon "send" %}</button>
+      </form>
+    </aside>
+  </div>
+
+  {% if inapp_video %}{# In-app video is a test-only mode; the product uses WhatsApp only. #}
+  <div id="switcher" class="switcher" hidden>
+    <button id="use-inapp" type="button" class="btn btn--ghost">{% icon "video" %}<span>WhatsApp not working? Use video in Stelleye</span></button>
+    <button id="use-whatsapp" type="button" class="btn btn--ghost" hidden>{% icon "phone" %}<span>Go back to WhatsApp</span></button>
+  </div>
+  {% endif %}
+
+  <div class="controls" role="group" aria-label="Call controls">
+    {% if inapp_video %}
+    <button id="ctl-mute" type="button" class="ctl ctl--media" aria-pressed="false" disabled>{% icon "mic" "lg" %}<span>Mute</span></button>
+    {% if role == "member" %}
+      <button id="ctl-flip" type="button" class="ctl ctl--media" disabled>{% icon "switch-camera" "lg" %}<span>Flip camera</span></button>
+      <button id="ctl-torch" type="button" class="ctl ctl--media" aria-pressed="false" hidden>{% icon "flashlight" "lg" %}<span>Light</span></button>
+    {% else %}
+      <button id="ctl-camera" type="button" class="ctl ctl--media" aria-pressed="false" disabled>{% icon "video" "lg" %}<span>Camera off</span></button>
+    {% endif %}
+    {% endif %}
+    <button id="ctl-chat" type="button" class="ctl ctl--chat" aria-pressed="false" aria-controls="chat" disabled>{% icon "message" "lg" %}<span>Chat</span><span id="chat-unread" class="ctl__badge" hidden></span></button>
+    <button id="ctl-end" type="button" class="ctl ctl--end">{% icon "phone-off" "lg" %}<span id="ctl-end-label">Cancel</span></button>
+  </div>
+</section>

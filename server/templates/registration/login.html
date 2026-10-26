@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Sign in · Stelleye{% endblock %}
+{% block header_anon %}<nav class="site-nav" aria-label="Main"><a class="btn btn--primary btn--sm" href="{% url 'signup' %}">{% icon "user-plus" %}<span>Sign up</span></a></nav>{% endblock %}
+{% block page_class %}page--auth{% endblock %}
+{% block content %}
+<section id="signin" class="auth-card card" aria-labelledby="signin-title">
+  <div class="auth-card__head">
+    {% include "ui/_logo_mark.html" %}
+    <h1 id="signin-title">Welcome back</h1>
+    <p class="muted">Sign in to get help or to guide.</p>
+  </div>
+  <form method="post" class="form-stack" novalidate>
+    {% csrf_token %}
+    {% if form.errors %}<p class="form-error" role="alert">{% icon "alert" %} Wrong username or password.</p>{% endif %}
+    <div class="field">
+      <label class="field-label" for="id_username">Username</label>
+      <input id="id_username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required autofocus>
+    </div>
+    <div class="field">
+      <label class="field-label" for="id_password">Password</label>
+      <input id="id_password" name="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn btn--primary btn--block">Sign in</button>
+  </form>
+  <p class="muted center">New to Stelleye? <a href="{% url 'signup' %}">Create an account</a></p>
+</section>
+
+{% if demo_users %}
+<details class="card auth-demo">
+  <summary>{% icon "user" %} Demo accounts (testnet)</summary>
+  <div class="account-grid">
+    {% for demo in demo_users %}
+      <form method="post" action="{% url 'demo_login' demo.username %}">
+        {% csrf_token %}
+        <button type="submit" class="account">
+          <span class="account__avatar">{% if demo.profile.is_guide %}{% icon "headphones" %}{% elif demo.profile %}{% icon "eye" %}{% else %}{% icon "scale" %}{% endif %}</span>
+          <span>
+            <span class="account__name">{% if demo.profile %}{{ demo.profile.display_name }}{% else %}Reviewer{% endif %}</span>
+            <span class="account__role">{% if demo.profile %}{{ demo.profile.get_role_display }}{% if demo.profile.city %} · {{ demo.profile.city }}{% endif %}{% else %}Verifies guides, reviews reports{% endif %}</span>
+          </span>
+        </button>
+      </form>
+    {% endfor %}
+  </div>
+</details>
+{% endif %}
+{% endblock %}

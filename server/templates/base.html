@@ -1,0 +1,73 @@
+{% load static ui %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0369a1">
+  <meta name="description" content="Stelleye: live video help from sighted guides, paid by the minute in USDC on Stellar.">
+  <title>{% block title %}Stelleye{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <link rel="icon" href="{% static 'img/stelleye-icon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% icon_sprite %}
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="app-header">
+    <a class="brand" href="{% url 'home' %}" aria-label="Stelleye home">
+      {% include "ui/_logo_mark.html" %}
+      <span class="brand__name">Stell<span class="brand__eye">eye</span></span>
+    </a>
+    <div class="header-actions">
+      {% if user.is_authenticated %}
+        {% block header_extra %}{% endblock %}
+        {% if user.is_staff %}<a class="btn btn--ghost btn--sm" href="{% url 'review' %}">{% icon "scale" %}<span>Review</span></a>{% endif %}
+        {# Who is signed in; pages with an Account tab point the chip straight at it. #}
+        <a class="user-chip" href="{% block account_href %}{% url 'home' %}{% endblock %}">
+          <span class="user-chip__avatar" aria-hidden="true">{% if user.profile %}{{ user.profile.initials }}{% else %}{% icon "user" "sm" %}{% endif %}</span>
+          <span class="user-chip__name"><span class="visually-hidden">Signed in as </span>{% firstof user.profile.display_name user.get_username %}</span>
+        </a>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button class="btn btn--ghost btn--sm" type="submit">{% icon "log-out" %}<span>Sign out</span></button>
+        </form>
+      {% else %}
+        {% block header_anon %}
+          <nav class="site-nav" aria-label="Main">
+            <a class="btn btn--ghost btn--sm" href="{% url 'login' %}">{% icon "log-in" %}<span>Sign in</span></a>
+            <a class="btn btn--primary btn--sm" href="{% url 'signup' %}">{% icon "user-plus" %}<span>Sign up</span></a>
+          </nav>
+        {% endblock %}
+      {% endif %}
+    </div>
+  </header>
+
+  {# The one live region: speak.js writes every spoken update here. #}
+  <div id="announcer" class="visually-hidden" aria-live="assertive" aria-atomic="true"></div>
+  <p id="connection" class="connection" hidden>{% icon "wifi-off" %}<span>Reconnecting to Stelleye…</span></p>
+  {% if user.is_authenticated %}
+  <div id="elsewhere" class="elsewhere" role="alertdialog" aria-modal="true" aria-labelledby="elsewhere-title" aria-describedby="elsewhere-text" hidden>
+    <div class="elsewhere__box">
+      <h2 id="elsewhere-title">Stelleye is open somewhere else</h2>
+      <p id="elsewhere-text">You opened Stelleye in another tab, window or device, so calls continue there. Any call in progress keeps running.</p>
+      <button id="elsewhere-btn" type="button" class="btn btn--primary btn--block" onclick="location.reload()">Use Stelleye here</button>
+    </div>
+  </div>
+  {% endif %}
+
+  <main id="main" tabindex="-1" class="page {% block page_class %}{% endblock %}">
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}<li class="message {{ message.tags }}" role="alert">{{ message }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Guide · Stelleye{% endblock %}
+{% block account_href %}#account{% endblock %}
+{% block content %}
+<div id="home-view" class="home">
+  <header class="greet">
+    <p class="greet__hello">Hi {{ profile.display_name }}</p>
+    <div class="title-row">
+      <h1 id="home-title" tabindex="-1">Be someone's eyes today</h1>
+      <span class="tip">
+        <button type="button" class="tip__btn" aria-expanded="false" aria-controls="tip-earning">{% icon "help-circle" %}<span class="visually-hidden">How you are paid</span></button>
+        <span id="tip-earning" class="tip__panel" hidden>You earn {{ profile.rate_per_minute }} {{ asset_code }} a minute, settled on Stellar. Earnings are held for {{ hold_label }} after each call so the caller can report a problem; then you can withdraw them.</span>
+      </span>
+    </div>
+  </header>
+
+  {# Three calm tabs, as on the caller's page; the URL hash names the open tab (#earnings, ...). #}
+  <div class="tabs" role="tablist" aria-label="Sections">
+    <button type="button" role="tab" id="tab-calls" data-tab="calls" aria-controls="panel-calls" aria-selected="true">{% icon "headphones" %}<span>Calls</span></button>
+    <button type="button" role="tab" id="tab-earnings" data-tab="earnings" aria-controls="panel-earnings" aria-selected="false" tabindex="-1">{% icon "wallet" %}<span>Earnings</span></button>
+    <button type="button" role="tab" id="tab-account" data-tab="account" aria-controls="panel-account" aria-selected="false" tabindex="-1">{% icon "user" %}<span>Account</span></button>
+  </div>
+
+  <section id="panel-calls" class="tabpanel" role="tabpanel" aria-labelledby="tab-calls" tabindex="0">
+  <p id="status" class="status-pill"><span class="status-pill__dot" aria-hidden="true"></span><span id="status-text">{% if profile.is_verified %}You are offline.{% else %}Your account is waiting for verification.{% endif %}</span></p>
+
+  {% if not profile.whatsapp %}{% include "people/_whatsapp_card.html" with help_text="You video call the people you help on WhatsApp." %}{% endif %}
+
+  <section id="verify-card" class="card card--notice" aria-labelledby="verify-title" {% if profile.is_verified %}hidden{% endif %}>
+    <div class="title-row">
+      <h2 id="verify-title" class="card-title">{% icon "shield-check" %} Waiting for verification</h2>
+      <span class="tip">
+        <button type="button" class="tip__btn" aria-expanded="false" aria-controls="tip-verify">{% icon "help-circle" %}<span class="visually-hidden">About verification</span></button>
+        <span id="tip-verify" class="tip__panel" hidden>A Stelleye reviewer checks every guide before they can take calls. Your approval is written to the guide registry in the CallEscrow contract on Stellar, and this page updates by itself.</span>
+      </span>
+    </div>
+  </section>
+
+  {# One big tap button: pressed means online and taking calls. #}
+  <div class="help">
+    <button id="online-btn" class="help-orb power-orb" aria-pressed="false" {% if not profile.is_verified %}disabled{% endif %}>
+      <span class="help-orb__icon">{% icon "power" "xl" %}</span>
+      <span class="help-orb__label" id="online-label">Go online</span>
+      <span class="help-orb__sub" id="online-sub">{% if profile.is_verified %}Tap to take calls{% else %}Waiting for verification{% endif %}</span>
+    </button>
+    <p id="verified-line" class="verified-line" {% if not profile.is_verified %}hidden{% endif %}>{% icon "shield-check" "sm" %} Verified guide on Stellar</p>
+  </div>
+
+  <section id="incoming-view" class="card incoming" hidden aria-labelledby="incoming-heading">
+    <span class="incoming__ring" aria-hidden="true"><span class="avatar avatar--lg" id="incoming-avatar"></span></span>
+    <h2 id="incoming-heading" tabindex="-1">Incoming call</h2>
+    <p id="incoming-text" class="incoming__text"></p>
+    <p id="incoming-meta" class="muted"></p>
+    <div class="actions actions--split">
+      <button id="decline-btn" class="btn btn--secondary">{% icon "x" %}<span>Decline</span></button>
+      <button id="accept-btn" class="btn btn--success">{% icon "video" %}<span>Accept</span></button>
+    </div>
+  </section>
+
+  <section id="ended-view" class="card" hidden aria-labelledby="ended-heading">
+    <div class="receipt__head">
+      <span class="receipt__icon">{% icon "check" "lg" %}</span>
+      <div>
+        <h2 id="ended-heading" tabindex="-1">Call ended</h2>
+        <p id="ended-text" class="muted"></p>
+      </div>
+    </div>
+    <a id="ended-tx" class="link-ext" href="#" target="_blank" rel="noopener">{% icon "external" "sm" %}<span>See the settlement on Stellar</span></a>
+    <button id="ended-ok" class="btn btn--secondary btn--block">Done</button>
+  </section>
+
+  </section>
+
+  <section id="panel-earnings" class="tabpanel" role="tabpanel" aria-labelledby="tab-earnings" tabindex="0" hidden>
+  <section class="card" aria-labelledby="earnings-heading">
+    <div class="wallet">
+      <h2 id="earnings-heading" class="card-title">{% icon "wallet" %} Earnings</h2>
+      <a class="link-ext" href="{{ wallet_url }}" target="_blank" rel="noopener">{% icon "external" "sm" %}<span>Wallet on Stellar</span></a>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="stat__label">{% icon "wallet" "sm" %} In your wallet</span><span class="stat__value"><span id="balance">{{ balance }}</span> <small class="muted">{{ asset_code }}</small></span></div>
+      <div class="stat"><span class="stat__label">{% icon "download" "sm" %} Ready to withdraw</span><span class="stat__value" id="stat-ready">{{ totals.ready }}</span></div>
+      <div class="stat"><span class="stat__label">{% icon "clock" "sm" %} On hold</span><span class="stat__value" id="stat-held">{{ totals.held }}</span></div>
+    </div>
+    <div class="money" role="group" aria-labelledby="cashout-label">
+      <div class="title-row">
+        <p id="cashout-label" class="field-label">Cash out to your bank</p>
+        <span class="tip">
+          <button type="button" class="tip__btn" aria-expanded="false" aria-controls="tip-cashout">{% icon "help-circle" %}<span class="visually-hidden">About cashing out</span></button>
+          <span id="tip-cashout" class="tip__panel" hidden>Enter your bank details on our payment partner's secure page (it opens in a new tab), then confirm the amounts here. Up to 10 {{ asset_code }} at a time on testnet.</span>
+        </span>
+      </div>
+      <form id="cashout-form" class="cashout" novalidate>
+        <label class="visually-hidden" for="cashout-amount">Amount to cash out, in {{ asset_code }}</label>
+        <input id="cashout-amount" name="amount" type="number" inputmode="decimal" min="1" max="10" step="0.01" value="1.00" required>
+        <button type="submit" class="btn btn--primary money-btn" data-kind="withdraw">{% icon "download" %}<span>Cash out</span></button>
+      </form>
+      {% include "wallets/_transfer_panel.html" %}
+    </div>
+    {# Folded by default; opens by itself when an earning is ready to withdraw. #}
+    <details class="records records--nested" id="earnings-records" {% if totals.ready != "0.00" %}open{% endif %}>
+      <summary><h3 class="records__title">{% icon "clock" "sm" %} Call history</h3></summary>
+    <ul id="earnings-list" class="list">
+      {% for call in calls %}
+        <li class="list-item">
+          <div class="list-item__main">
+            <span class="list-item__title">{{ call.with }} · {{ call.guide_share }} {{ asset_code }}</span>
+            <span class="list-item__meta">{{ call.date|date:"M j, H:i" }} · {{ call.seconds }} s</span>
+          </div>
+          <div class="list-item__side">
+            {% if call.can_claim %}
+              <button class="btn btn--success btn--sm claim-btn" data-call-id="{{ call.call_id }}">{% icon "download" "sm" %}<span>Withdraw</span></button>
+            {% else %}
+              {% status_badge call.status call.status_label %}
+            {% endif %}
+          </div>
+        </li>
+      {% empty %}
+        <li class="empty">No calls yet. Go online and your calls will appear here.</li>
+      {% endfor %}
+    </ul>
+    </details>
+  </section>
+
+  </section>
+
+  <section id="panel-account" class="tabpanel" role="tabpanel" aria-labelledby="tab-account" tabindex="0" hidden>
+    {% if profile.whatsapp %}{% include "people/_whatsapp_card.html" with help_text="People you help see this number when you call them." open=True %}{% endif %}
+    <section class="card" aria-labelledby="profile-title">
+      <h2 id="profile-title" class="card-title">{% icon "user" %} Your profile</h2>
+      <dl class="receipt__rows">
+        <div><dt>Rate</dt><dd>{{ profile.rate_per_minute }} {{ asset_code }} a minute</dd></div>
+        <div><dt>Languages</dt><dd>{{ profile.language_names|join:", " }}</dd></div>
+        {% if profile.city %}<div><dt>City</dt><dd>{{ profile.city }}</dd></div>{% endif %}
+        <div><dt>Status</dt><dd id="profile-status">{% if profile.is_verified %}Verified on Stellar{% else %}Waiting for verification{% endif %}</dd></div>
+      </dl>
+    </section>
+  </section>
+</div>
+
+{% include "calls/_stage.html" with role="guide" %}
+
+{{ call_config|json_script:"call-config" }}
+{% endblock %}
+{% block scripts %}
+{% if inapp_video %}<script src="{% static 'vendor/simplepeer-9.11.1.min.js' %}"></script>{% endif %}
+<script type="module" src="{% static 'js/guide.js' %}"></script>
+{% endblock %}

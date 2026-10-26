@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}Get help · Stelleye{% endblock %}
+{% block account_href %}#account{% endblock %}
+{% block header_extra %}<a class="chip" href="#wallet" aria-label="Wallet, {{ balance }} {{ asset_code }}">{% icon "wallet" "sm" %}<span id="header-balance">{{ balance }}</span> {{ asset_code }}</a>{% endblock %}
+{% block content %}
+<div id="home-view" class="home">
+  <header class="greet">
+    <p class="greet__hello">Hi {{ profile.display_name }}</p>
+    <h1 id="home-title" tabindex="-1">Live help from a sighted guide</h1>
+  </header>
+
+  {# Four calm tabs instead of one long page; the URL hash names the open tab (#wallet, ...). #}
+  <div class="tabs" role="tablist" aria-label="Sections">
+    <button type="button" role="tab" id="tab-help" data-tab="help" aria-controls="panel-help" aria-selected="true">{% icon "video" %}<span>Get help</span></button>
+    <button type="button" role="tab" id="tab-guides" data-tab="guides" aria-controls="panel-guides" aria-selected="false" tabindex="-1">{% icon "users" %}<span>Guides</span></button>
+    <button type="button" role="tab" id="tab-wallet" data-tab="wallet" aria-controls="panel-wallet" aria-selected="false" tabindex="-1">{% icon "wallet" %}<span>Wallet</span></button>
+    <button type="button" role="tab" id="tab-account" data-tab="account" aria-controls="panel-account" aria-selected="false" tabindex="-1">{% icon "user" %}<span>Account</span></button>
+  </div>
+
+  <section id="panel-help" class="tabpanel" role="tabpanel" aria-labelledby="tab-help" tabindex="0">
+    <p id="status" class="status-pill"><span class="status-pill__dot" aria-hidden="true"></span><span id="status-text">Ready when you are.</span></p>
+    {% if not profile.whatsapp %}{% include "people/_whatsapp_card.html" with help_text="Your guide video calls you on WhatsApp, so you only need to answer." %}{% endif %}
+
+    <div class="help">
+      <button id="help-btn" class="help-orb" aria-describedby="help-hint">
+        <span class="help-orb__icon">{% icon "video" "xl" %}</span>
+        <span class="help-orb__label" id="help-label">Get help now</span>
+        <span class="help-orb__sub">First available guide</span>
+      </button>
+      <div class="help-meta">
+        <span class="tip tip--lg tip--center">
+          <button type="button" class="tip__btn" aria-expanded="false" aria-controls="help-hint">{% icon "help-circle" %}<span class="visually-hidden">How paying for a call works</span></button>
+          <span id="help-hint" class="tip__panel" hidden>Up to <strong id="hint-budget">{{ default_budget }} {{ asset_code }}</strong> is locked on Stellar when a guide accepts. You pay only for the seconds you use; the rest comes back the moment you hang up.</span>
+        </span>
+        <details class="options-pop" id="call-options">
+          <summary class="icon-btn options-pop__toggle">{% icon "sliders" %}<span class="visually-hidden">Call options</span></summary>
+          <div class="card options-pop__panel">
+            <div class="field">
+              <label class="field-label" for="language">Language</label>
+              <select id="language">
+                {% for code, name in languages %}<option value="{{ code }}">{{ name }}</option>{% endfor %}
+              </select>
+            </div>
+            <fieldset class="segmented">
+              <legend class="field-label">Most I want to spend ({{ asset_code }})</legend>
+              {% for amount in budgets %}
+                <label><input type="radio" name="budget" value="{{ amount }}" {% if amount == default_budget %}checked{% endif %}><span>{{ amount }}</span></label>
+              {% endfor %}
+            </fieldset>
+          </div>
+        </details>
+      </div>
+      <p class="online-line"><span id="online-summary">Checking who is online…</span> <button type="button" class="link-btn" id="choose-guide">Choose a guide</button></p>
+    </div>
+  </section>
+
+  <section id="panel-guides" class="tabpanel" role="tabpanel" aria-labelledby="tab-guides" tabindex="0" hidden>
+    <section class="card" aria-labelledby="guides-title">
+      <div class="title-row">
+        <h2 id="guides-title" class="card-title" tabindex="-1">{% icon "users" %} Guides</h2>
+        <span class="tip">
+          <button type="button" class="tip__btn" aria-expanded="false" aria-controls="tip-guides">{% icon "help-circle" %}<span class="visually-hidden">About choosing guides</span></button>
+          <span id="tip-guides" class="tip__panel" hidden>Guides who are online appear first, cheapest first. Tap the heart to save a guide, and Call to reach them directly while they are online.</span>
+        </span>
+      </div>
+      {# Favourites first; each list folds away on its own. #}
+      <details class="records records--nested" id="saved-records" open>
+        <summary><h3 class="records__title records__title--saved">{% icon "heart" "sm" %} My guides</h3></summary>
+        <ul id="saved-list" class="guide-list"></ul>
+        <p id="saved-empty" class="empty" hidden>Save a guide during or after a call to find them here.</p>
+      </details>
+      <details class="records records--nested" id="online-records" open>
+        <summary><h3 class="records__title records__title--online"><span class="online-dot" aria-hidden="true"></span> Online now</h3></summary>
+        <ul id="guides-list" class="guide-list"></ul>
+        <p id="guides-empty" class="empty" hidden>Nobody is online right now. Get help now keeps looking for you.</p>
+      </details>
+    </section>
+  </section>
+
+  <section id="panel-wallet" class="tabpanel" role="tabpanel" aria-labelledby="tab-wallet" tabindex="0" hidden>
+  {# Wallet: balance, adding money, and every transaction in one place. #}
+  <section id="wallet" class="card wallet-card" aria-labelledby="wallet-heading" tabindex="-1">
+    <div class="wallet-card__top">
+      <div>
+        <h2 id="wallet-heading" class="card-title">{% icon "wallet" %} Wallet</h2>
+        <p class="balance"><span id="balance">{{ balance }}</span><span class="unit">{{ asset_code }}</span></p>
+      </div>
+      <a class="link-ext" href="{{ wallet_url }}" target="_blank" rel="noopener">{% icon "external" "sm" %}<span>View on Stellar</span></a>
+    </div>
+
+    <div class="money" role="group" aria-labelledby="add-money-label">
+      <div class="title-row">
+        <p id="add-money-label" class="field-label">Add money</p>
+        <span class="tip">
+          <button type="button" class="tip__btn" aria-expanded="false" aria-controls="tip-add-money">{% icon "help-circle" %}<span class="visually-hidden">About adding money</span></button>
+          <span id="tip-add-money" class="tip__panel" hidden>You pay by card or bank transfer on our payment partner's secure page ({{ anchor_domain }}, Stellar's test anchor). It opens in a new tab, and this page tells you when the money arrives.</span>
+        </span>
+      </div>
+      <div class="topup__options">
+        {% for amount in add_money_amounts %}
+          <button type="button" class="btn btn--primary money-btn" data-kind="deposit" data-amount="{{ amount }}" aria-label="Add {{ amount }} US dollars">{% icon "plus" "sm" %}<span>{{ amount }} USD</span></button>
+        {% endfor %}
+      </div>
+      {% include "wallets/_transfer_panel.html" %}
+    </div>
+
+    <details class="records records--nested" id="history-records">
+      <summary><h3 id="history-heading" class="records__title">{% icon "clock" "sm" %} Transactions</h3></summary>
+      <ul id="history" class="list tx-list">
+        {% for t in transactions %}
+          <li class="list-item tx">
+            <div class="list-item__main">
+              <span class="list-item__title">{{ t.title }}</span>
+              <span class="list-item__meta">{{ t.date|date:"M j, H:i" }} · {{ t.detail }}{% if t.tx_url %} · <a href="{{ t.tx_url }}" target="_blank" rel="noopener">Stellar</a>{% endif %}</span>
+            </div>
+            <div class="tx__side">
+              <span class="tx__amount {% if t.incoming %}tx__amount--in{% endif %}">{{ t.amount }} <small>{{ asset_code }}</small></span>
+              <span class="badge badge--{{ t.tone }}">{% icon t.icon "sm" %}<span>{{ t.status_label }}</span></span>
+            </div>
+          </li>
+        {% empty %}
+          <li class="empty">No transactions yet. Money you add and calls you make appear here.</li>
+        {% endfor %}
+      </ul>
+    </details>
+  </section>
+  </section>
+
+  <section id="panel-account" class="tabpanel" role="tabpanel" aria-labelledby="tab-account" tabindex="0" hidden>
+    {% if profile.whatsapp %}{% include "people/_whatsapp_card.html" with help_text="Your guide video calls you on this WhatsApp number." open=True %}{% endif %}
+    <section class="card" aria-labelledby="prefs-title">
+      <h2 id="prefs-title" class="card-title">{% icon "volume" %} Listening</h2>
+      <label class="check"><input type="checkbox" id="speak-aloud"> Speak updates aloud (without a screen reader)</label>
+    </section>
+  </section>
+</div>
+
+{% include "calls/_stage.html" with role="member" %}
+
+<section id="receipt" class="card receipt" hidden aria-labelledby="receipt-heading">
+  <div class="receipt__head">
+    <span class="receipt__icon">{% icon "check" "lg" %}</span>
+    <div>
+      <h2 id="receipt-heading" tabindex="-1">Call ended</h2>
+      <p class="muted" id="receipt-sub">Here is what happened with your money.</p>
+    </div>
+  </div>
+  <dl class="receipt__rows">
+    <div><dt>Call length</dt><dd id="r-duration">–</dd></div>
+    <div><dt>You paid</dt><dd id="r-paid">–</dd></div>
+    <div><dt>Returned to your wallet</dt><dd id="r-refund">–</dd></div>
+    <div id="r-hold-row"><dt>Guide payment held until</dt><dd id="r-hold">–</dd></div>
+  </dl>
+
+  <div id="r-save" class="save-card" hidden>
+    <span class="avatar" id="r-avatar" aria-hidden="true"></span>
+    <p id="r-save-text" class="save-card__text"></p>
+    <button id="r-save-btn" type="button" class="save-btn" aria-pressed="false">{% icon "heart" %}<span id="r-save-label">Save guide</span></button>
+  </div>
+
+  <div class="actions actions--split">
+    <button id="confirm-btn" class="btn btn--success">{% icon "check" %}<span>Pay the guide now</span></button>
+    <button id="report-open-btn" class="btn btn--danger">{% icon "alert" %}<span>Report a problem</span></button>
+  </div>
+  <form id="report-form" class="field" hidden>
+    <label class="field-label" for="report-reason">What went wrong?</label>
+    <textarea id="report-reason" rows="3" required></textarea>
+    <button type="submit" class="btn btn--secondary">Send report</button>
+  </form>
+
+  <ul class="tx-links" aria-label="Stellar transactions">
+    <li><a id="r-open-tx" class="link-ext" href="#" target="_blank" rel="noopener">{% icon "lock" "sm" %}<span>Budget locked</span></a></li>
+    <li><a id="r-close-tx" class="link-ext" href="#" target="_blank" rel="noopener">{% icon "external" "sm" %}<span>Call settled</span></a></li>
+    <li><a id="r-payout-tx" class="link-ext" href="#" target="_blank" rel="noopener" hidden>{% icon "check" "sm" %}<span>Guide paid</span></a></li>
+  </ul>
+
+  <details class="transcript">
+    <summary>{% icon "message" %} Chat from this call</summary>
+    <ol id="r-transcript" class="chat__log chat__log--static"></ol>
+  </details>
+
+  <button id="again-btn" class="btn btn--primary btn--block">Done</button>
+</section>
+
+{{ guides|json_script:"initial-guides" }}
+{{ call_config|json_script:"call-config" }}
+{% endblock %}
+{% block scripts %}
+{% if inapp_video %}<script src="{% static 'vendor/simplepeer-9.11.1.min.js' %}"></script>{% endif %}
+<script type="module" src="{% static 'js/member.js' %}"></script>
+{% endblock %}

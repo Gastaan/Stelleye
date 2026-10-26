@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Review · Stelleye{% endblock %}
+{% block content %}
+<header class="page-head">
+  <h1>Review</h1>
+  <p class="muted">Verify new guides and decide reported calls. Every decision is a transaction on the CallEscrow contract.</p>
+</header>
+
+{# Every record list folds; open work starts expanded, finished work starts collapsed. #}
+<details class="card records" {% if pending_guides %}open{% endif %}>
+  <summary><h2 id="pending-title" class="card-title">{% icon "shield-check" %} Guides waiting for verification</h2></summary>
+  {% if pending_guides %}
+    <ul class="list">
+      {% for guide in pending_guides %}
+        <li class="list-item">
+          <div class="list-item__main">
+            <span class="list-item__title">{{ guide.display_name }}{% if guide.city %} · {{ guide.city }}{% endif %}</span>
+            <span class="list-item__meta">{{ guide.language_names|join:", " }} · {{ guide.rate_per_minute }} {{ cfg.asset_code }}/min · @{{ guide.user.username }}</span>
+          </div>
+          <form method="post" action="{% url 'verify_guide' guide.id %}">
+            {% csrf_token %}
+            <button class="btn btn--primary btn--sm" type="submit" aria-label="Verify {{ guide.display_name }} on Stellar">{% icon "shield-check" "sm" %}<span>Verify on Stellar</span></button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="empty">Every guide is verified.</p>
+  {% endif %}
+</details>
+
+<h2 class="section-title">Reported calls</h2>
+{% for report in reports %}
+  <details class="card records" {% if report.is_open %}open{% endif %}>
+    <summary>
+      <h3 id="report-{{ report.id }}" class="card-title">{% icon "scale" %} {{ report.call.member.profile.display_name }} with {{ report.call.guide.profile.display_name }}</h3>
+      {% if report.is_open %}{% status_badge "disputed" "Needs review" %}{% else %}{% status_badge "resolved" "Resolved" %}{% endif %}
+    </summary>
+    <dl class="receipt__rows">
+      <div><dt>Reason</dt><dd>{{ report.reason }}</dd></div>
+      <div><dt>Call length</dt><dd>{{ report.call.seconds }} s</dd></div>
+      <div><dt>Guide earned</dt><dd>{{ report.call.earned }}</dd></div>
+    </dl>
+    {% if report.call.messages.exists %}
+      <details class="transcript">
+        <summary>{% icon "message" %} Chat from the call</summary>
+        <ol class="chat__log chat__log--static">
+          {% for m in report.call.messages.all %}
+            <li class="msg {% if not m.sender %}msg--system{% elif m.sender_id == report.call.member_id %}msg--peer{% else %}msg--mine{% endif %}"><strong>{% if m.sender %}{{ m.sender.profile.display_name }}{% else %}Stelleye{% endif %}:</strong> {{ m.body }}</li>
+          {% endfor %}
+        </ol>
+      </details>
+    {% endif %}
+    <a class="link-ext" href="{{ cfg.explorer_url }}/tx/{{ report.report_tx }}" target="_blank" rel="noopener">{% icon "external" "sm" %}<span>Report transaction</span></a>
+    {% if report.is_open %}
+      <form method="post" action="{% url 'resolve' report.id %}" class="form-stack">
+        {% csrf_token %}
+        <div class="field">
+          <label class="field-label" for="refund-{{ report.id }}">Refund to the caller (0 to {{ report.call.earned }})</label>
+          <input id="refund-{{ report.id }}" name="refund" type="number" inputmode="decimal" step="0.0000001" min="0" max="{{ report.call.earned }}" value="{{ report.call.earned }}" required>
+        </div>
+        <div class="field">
+          <label class="field-label" for="note-{{ report.id }}">Note for the record</label>
+          <input id="note-{{ report.id }}" name="note">
+        </div>
+        <button class="btn btn--primary" type="submit">{% icon "shield-check" %}<span>Record decision on-chain</span></button>
+      </form>
+    {% else %}
+      <p>Refunded {{ report.refund_to_member }} to the caller · decided by {{ report.resolved_by }}.</p>
+      <a class="link-ext" href="{{ cfg.explorer_url }}/tx/{{ report.resolve_tx }}" target="_blank" rel="noopener">{% icon "external" "sm" %}<span>Decision transaction</span></a>
+    {% endif %}
+  </details>
+{% empty %}
+  <section class="card"><p class="empty">No reports. Calls are going well.</p></section>
+{% endfor %}
+{% endblock %}

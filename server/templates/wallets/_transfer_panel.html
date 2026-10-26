@@ -1,0 +1,11 @@
+{% load ui %}
+{# Live status of an Add money / Cash out through the anchor; driven by static/js/money.js. #}
+<div id="transfer-panel" class="transfer" role="group" aria-labelledby="transfer-title" hidden>
+  <p id="transfer-title" class="transfer__title"></p>
+  <p id="transfer-status" class="transfer__status"></p>
+  <div class="actions">
+    <button id="transfer-confirm" type="button" class="btn btn--success" hidden>{% icon "check" %}<span>Confirm cash out</span></button>
+    <a id="transfer-open" class="btn btn--secondary" href="#" target="_blank" rel="noopener" hidden>{% icon "external" %}<span>Open the payment page</span></a>
+  </div>
+  <a id="transfer-tx" class="link-ext" href="#" target="_blank" rel="noopener" hidden>{% icon "external" "sm" %}<span>See it on Stellar</span></a>
+</div>

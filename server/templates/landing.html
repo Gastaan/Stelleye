@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Stelleye · eyes on call for blind people, paid on Stellar worldwide{% endblock %}
+{% block page_class %}page--wide{% endblock %}
+{% block content %}
+{# Introduction only, kept minimal; the header carries the two actions: Sign in and Sign up. #}
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__text">
+    {# One statement, not three: the product's line is the headline. #}
+    <h1 id="hero-title" class="hero__title">
+      <span class="hero__brand">Stell<span class="brand__eye">eye</span>:</span>
+      <span>eyes on call for blind people,</span>
+      <span class="hero__accent">paid on Stellar worldwide.</span>
+    </h1>
+  </div>
+  <div class="hero__art" aria-hidden="true">{% include "ui/_logo_mark.html" %}</div>
+</section>
+
+<section aria-labelledby="how-title">
+  <h2 id="how-title" class="visually-hidden">How it works</h2>
+  <ol class="steps-row">
+    <li><span class="steps-row__icon" aria-hidden="true">{% icon "users" "lg" %}</span><span class="steps-row__text"><strong>Pick a guide</strong><span>or tap Get help now</span></span></li>
+    <li><span class="steps-row__icon" aria-hidden="true">{% icon "phone" "lg" %}</span><span class="steps-row__text"><strong>Answer on WhatsApp</strong><span>your guide calls you</span></span></li>
+    <li><span class="steps-row__icon" aria-hidden="true">{% icon "clock" "lg" %}</span><span class="steps-row__text"><strong>Pay by the second</strong><span>the rest comes back</span></span></li>
+  </ol>
+</section>
+
+<footer class="site-footer">
+  <p class="guides-line">{% icon "headphones" %}<span><strong>Sighted?</strong> Lend your eyes and earn by the minute.</span></p>
+  <p class="site-footer__fine">Built on Stellar · Testnet demo</p>
+</footer>
+{% endblock %}
