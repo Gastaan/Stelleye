@@ -31,6 +31,11 @@ def home(request):
     return redirect("guide_home" if profile.is_guide else "member_home")
 
 
+def about(request):
+    """The problem Stelleye solves, for everyone (signed in or not)."""
+    return render(request, "about.html")
+
+
 class LoginPage(LoginView):
     template_name = "registration/login.html"
     redirect_authenticated_user = True

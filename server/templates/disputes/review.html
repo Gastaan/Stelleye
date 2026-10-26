@@ -8,7 +8,7 @@
 </header>
 
 {# Every record list folds; open work starts expanded, finished work starts collapsed. #}
-<details class="card records" {% if pending_guides %}open{% endif %}>
+<details class="card records">
   <summary><h2 id="pending-title" class="card-title">{% icon "shield-check" %} Guides waiting for verification</h2></summary>
   {% if pending_guides %}
     <ul class="list">
@@ -32,7 +32,7 @@
 
 <h2 class="section-title">Reported calls</h2>
 {% for report in reports %}
-  <details class="card records" {% if report.is_open %}open{% endif %}>
+  <details class="card records">
     <summary>
       <h3 id="report-{{ report.id }}" class="card-title">{% icon "scale" %} {{ report.call.member.profile.display_name }} with {{ report.call.guide.profile.display_name }}</h3>
       {% if report.is_open %}{% status_badge "disputed" "Needs review" %}{% else %}{% status_badge "resolved" "Resolved" %}{% endif %}

@@ -65,6 +65,7 @@ def main() -> int:
         reviewer.goto(f"{base}/login/")
         reviewer.locator(".auth-demo summary").click()  # demo accounts sit in a collapsed section
         reviewer.locator("form[action$='/demo-login/reviewer/'] button").click()
+        reviewer.locator("details.records", has_text="waiting for verification").locator("summary").click()  # folded by default
         reviewer.get_by_role("button", name="Verify Bruno on Stellar").click()
         expect(reviewer.locator(".message.success")).to_be_visible(timeout=CHAIN)
         expect(guide.locator("#online-btn")).to_be_enabled(timeout=15_000)
@@ -73,6 +74,7 @@ def main() -> int:
 
         step("Paid call with the WhatsApp hand-off (about 45 seconds), then pay the guide")
         member.click("#tab-guides")
+        member.click("#online-records summary")  # sections start folded
         member.locator("#guides-list .guide", has_text="Bruno").get_by_role("button", name="Call Bruno").click()
         expect(guide.locator("#incoming-view")).to_be_visible(timeout=15_000)
         guide.click("#accept-btn")

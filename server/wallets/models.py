@@ -6,7 +6,7 @@ from stellar_sdk import Keypair
 class Wallet(models.Model):
     """App-managed Stellar account for v1.
 
-    The key is held by the server so blind users never handle seed phrases.
+    The key is held by the server so visually impaired users never handle seed phrases.
     Planned upgrade: passkey smart accounts (Face ID / Touch ID) with sponsored fees.
     """
 

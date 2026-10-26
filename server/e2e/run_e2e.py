@@ -150,6 +150,7 @@ def main() -> int:
         reviewer.locator("form[action$='/demo-login/reviewer/'] button").click()
         reviewer.wait_for_url(f"{base}/review/")
         axe(reviewer, "review")
+        reviewer.locator("details.records", has_text="waiting for verification").locator("summary").click()  # folded by default
         reviewer.get_by_role("button", name=f"Verify {guide_name} on Stellar").click()
         expect(reviewer.locator(".message.success")).to_contain_text("verified in the on-chain guide registry", timeout=CHAIN)
         shot(reviewer, "04-review-verified", full=True)
@@ -161,6 +162,7 @@ def main() -> int:
         guide.click("#online-btn")
         expect(guide.locator("#online-btn")).to_have_attribute("aria-pressed", "true")
         member.click("#tab-guides")
+        member.click("#online-records summary")  # sections start folded
         card = member.locator("#guides-list .guide", has_text=guide_name)
         expect(card).to_be_visible(timeout=10_000)
         expect(card.locator(".badge")).to_have_text("Available")
@@ -298,6 +300,7 @@ def main() -> int:
         check(guide.locator("#online-btn").is_hidden(), "guide's call summary sits in the online button's place")
         member.click("#again-btn")
         member.click("#tab-guides")
+        member.click("#saved-records summary")  # sections start folded
         saved = member.locator("#saved-list .guide", has_text=guide_name)
         expect(saved).to_be_visible()
         check(True, "guide appears under My guides")

@@ -18,7 +18,6 @@ const ONLINE_KEY = "sightline.guideOnline";
 let wantOnline = false;
 try { wantOnline = sessionStorage.getItem(ONLINE_KEY) === "1"; } catch { /* private mode */ }
 let incoming = null; // { callId }
-let lastClaimable = document.querySelectorAll(".claim-btn").length;
 let ringTimer = null;
 let endedCallId = null; // the call whose summary is showing
 
@@ -282,10 +281,6 @@ async function refresh() {
       $(id).closest(".stat").hidden = value === "0.00"; // only older calls still wait for a hold
     }
     if (data.calls.length) $("earnings-list").replaceChildren(...data.calls.map(row));
-    // Something new to withdraw: unfold the history so the Withdraw button is in reach.
-    const claimable = data.calls.filter((call) => call.can_claim).length;
-    if (claimable > lastClaimable) $("earnings-records").open = true;
-    lastClaimable = claimable;
   } catch {
     /* keep the last known values */
   }

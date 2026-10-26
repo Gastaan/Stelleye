@@ -1,4 +1,4 @@
-// Member (blind or low-vision caller): choose a guide or the first available, then the call stage, then the receipt.
+// Member (visually impaired caller): choose a guide or the first available, then the call stage, then the receipt.
 import { getJSON, post } from "./api.js";
 import { icon, toneBadge } from "./icons.js";
 import { connectLive, showElsewhere } from "./live.js";

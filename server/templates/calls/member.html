@@ -64,13 +64,13 @@
           <span id="tip-guides" class="tip__panel" hidden>Guides who are online appear first, cheapest first. Tap the heart to save a guide, and Call to reach them directly while they are online.</span>
         </span>
       </div>
-      {# Favourites first; each list folds away on its own. #}
-      <details class="records records--nested" id="saved-records" open>
+      {# Favourites first; both lists start folded ("Choose a guide" opens Online now). #}
+      <details class="records records--nested" id="saved-records">
         <summary><h3 class="records__title records__title--saved">{% icon "heart" "sm" %} My guides</h3></summary>
         <ul id="saved-list" class="guide-list"></ul>
         <p id="saved-empty" class="empty" hidden>Save a guide during or after a call to find them here.</p>
       </details>
-      <details class="records records--nested" id="online-records" open>
+      <details class="records records--nested" id="online-records">
         <summary><h3 class="records__title records__title--online"><span class="online-dot" aria-hidden="true"></span> Online now</h3></summary>
         <ul id="guides-list" class="guide-list"></ul>
         <p id="guides-empty" class="empty" hidden>Nobody is online right now. Get help now keeps looking for you.</p>
@@ -128,7 +128,7 @@
   </section>
 
   <section id="panel-account" class="tabpanel" role="tabpanel" aria-labelledby="tab-account" tabindex="0" hidden>
-    {% if profile.whatsapp %}{% include "people/_whatsapp_card.html" with help_text="Your guide video calls you on this WhatsApp number." open=True %}{% endif %}
+    {% if profile.whatsapp %}{% include "people/_whatsapp_card.html" with help_text="Your guide video calls you on this WhatsApp number." %}{% endif %}
     <section class="card" aria-labelledby="prefs-title">
       <h2 id="prefs-title" class="card-title">{% icon "volume" %} Listening</h2>
       <label class="check"><input type="checkbox" id="speak-aloud"> Speak updates aloud (without a screen reader)</label>

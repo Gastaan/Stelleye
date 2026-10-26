@@ -1,5 +1,5 @@
 {% load ui %}
-<details class="card {% if not profile.whatsapp %}card--notice{% endif %}" id="whatsapp-card" {% if not profile.whatsapp %}open{% endif %}>
+<details class="card {% if not profile.whatsapp %}card--notice{% endif %}" id="whatsapp-card">
   <summary>{% icon "phone" %} <span id="wa-heading">{% if profile.whatsapp %}Your WhatsApp: {{ profile.whatsapp_display }}{% else %}Add your WhatsApp number{% endif %}</span></summary>
   <form id="whatsapp-form" class="field" novalidate>
     <div class="title-row">

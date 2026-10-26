@@ -140,12 +140,21 @@ class PublicPagesTests(TestCase):
     def test_landing_introduces_and_navigation_carries_the_actions(self):
         page = self.client.get("/")
         self.assertEqual(page.status_code, 200)
-        self.assertContains(page, "eyes on call for blind people,")
+        self.assertContains(page, "eyes on call for visually impaired people,")
         self.assertContains(page, "paid on Stellar worldwide.")
         self.assertContains(page, 'aria-label="Main"')
         self.assertContains(page, 'href="/login/"')
         self.assertContains(page, 'href="/join/"')
         self.assertNotContains(page, 'name="password"')
+
+    def test_about_shows_the_problem_with_sources(self):
+        page = self.client.get("/about/")
+        self.assertEqual(page.status_code, 200)
+        for fact in ("2.2 billion", "$26 a month", "3 a.m.", "6.49%", "visually impaired"):
+            self.assertContains(page, fact)
+        self.assertContains(page, "who.int")  # each figure links its source
+        self.assertContains(page, "worldbank.org")
+        self.assertContains(self.client.get("/"), 'href="/about/"')
 
     def test_sign_in_is_its_own_page_and_signed_in_people_skip_the_landing(self):
         self.assertContains(self.client.get("/login/"), 'name="password"')

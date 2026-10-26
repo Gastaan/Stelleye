@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static ui %}
+{% block title %}About · Stelleye{% endblock %}
+{% block page_class %}page--wide{% endblock %}
+{% block content %}
+{# The problem, shown rather than told: four referenced facts, a label to try, then what Stelleye changes. #}
+<article class="about" aria-labelledby="about-title">
+  <header class="about__hero">
+    <p class="pill-label">About Stelleye</p>
+    <h1 id="about-title">Some things you just need to see</h1>
+    <p class="about__lead">A medicine label. A bus number. A letter. For visually impaired people, small moments like these decide the day.</p>
+  </header>
+
+  <section aria-labelledby="facts-title">
+    <h2 id="facts-title" class="visually-hidden">The problem in four facts</h2>
+    <ul class="facts">
+      <li class="fact">
+        <span class="fact__icon" aria-hidden="true">{% icon "eye" "lg" %}</span>
+        <strong class="fact__value">2.2 billion</strong>
+        <span class="fact__text">people live with a near or distance vision impairment.</span>
+        <a class="fact__source" href="https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment" target="_blank" rel="noopener">WHO, 2026</a>
+      </li>
+      <li class="fact">
+        <span class="fact__icon" aria-hidden="true">{% icon "wallet" "lg" %}</span>
+        <strong class="fact__value">$26 a month</strong>
+        <span class="fact__text">buys 20 minutes of paid visual help in the US: about $1.30 a minute, as a subscription.</span>
+        <a class="fact__source" href="https://aira.io/subscriptions/" target="_blank" rel="noopener">Aira plans</a>
+      </li>
+      <li class="fact">
+        <span class="fact__icon" aria-hidden="true">{% icon "clock" "lg" %}</span>
+        <strong class="fact__value">3 a.m.</strong>
+        <span class="fact__text">The people near you are asleep. Help around the clock means a guide in another time zone, on an international call.</span>
+      </li>
+      <li class="fact">
+        <span class="fact__icon" aria-hidden="true">{% icon "globe" "lg" %}</span>
+        <strong class="fact__value">6.49%</strong>
+        <span class="fact__text">average cost of sending $200 abroad, often taking days. Paying a guide a few dollars that way doesn't work.</span>
+        <a class="fact__source" href="https://remittanceprices.worldbank.org/sites/default/files/rpw_main_report_and_annex_q125_1_0.pdf" target="_blank" rel="noopener">World Bank, 2025</a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="about__try card" aria-labelledby="try-title">
+    <div class="about__try-text">
+      <h2 id="try-title">See it the way they do</h2>
+      <p class="muted">Low vision can turn a medicine label into this.</p>
+      <button type="button" id="clear-label" class="btn btn--secondary" aria-pressed="false">{% icon "eye" %}<span id="clear-label-text">Show it clearly</span></button>
+    </div>
+    <figure class="label-demo">
+      <div id="med-label" class="med-label is-blurred" aria-hidden="true">
+        <span class="med-label__name">IBUPROFEN 400 mg</span>
+        <span>Take 1 tablet every 8 hours with food.</span>
+        <span>No more than 3 tablets in 24 hours.</span>
+        <span class="med-label__exp">EXP 03/2026</span>
+      </div>
+      <figcaption class="visually-hidden">A medicine label, blurred the way low vision can blur it. It reads: Ibuprofen 400 mg. Take 1 tablet every 8 hours with food. No more than 3 tablets in 24 hours. Expires March 2026.</figcaption>
+    </figure>
+  </section>
+
+  <section aria-labelledby="moments-title">
+    <h2 id="moments-title" class="about__h2">Moments that need a pair of eyes</h2>
+    <ul class="moments">
+      <li><span class="moments__icon" aria-hidden="true">{% icon "pill" "lg" %}</span>Which pill is this?</li>
+      <li><span class="moments__icon" aria-hidden="true">{% icon "bus" "lg" %}</span>Is this my bus?</li>
+      <li><span class="moments__icon" aria-hidden="true">{% icon "mail" "lg" %}</span>What does this letter say?</li>
+      <li><span class="moments__icon" aria-hidden="true">{% icon "clock" "lg" %}</span>Is this still good to eat?</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="changes-title">
+    <h2 id="changes-title" class="about__h2">What Stelleye changes</h2>
+    <ol class="steps-row">
+      <li><span class="steps-row__icon" aria-hidden="true">{% icon "clock" "lg" %}</span><span class="steps-row__text"><strong>Pay by the second</strong><span>No subscription. The budget is locked on Stellar and the rest comes back the moment you hang up.</span></span></li>
+      <li><span class="steps-row__icon" aria-hidden="true">{% icon "users" "lg" %}</span><span class="steps-row__text"><strong>Help around the clock</strong><span>Verified guides worldwide call you on WhatsApp. Save the ones you trust.</span></span></li>
+      <li><span class="steps-row__icon" aria-hidden="true">{% icon "globe" "lg" %}</span><span class="steps-row__text"><strong>Paid in seconds, anywhere</strong><span>Guides get USDC the moment the call ends, for a fraction of a cent in fees.</span></span></li>
+    </ol>
+  </section>
+
+  {% if not user.is_authenticated %}
+    <p class="about__cta">
+      <a class="btn btn--primary btn--lg" href="{% url 'signup' %}?as=member">{% icon "video" %}<span>Get help</span></a>
+      <a class="btn btn--secondary btn--lg" href="{% url 'signup' %}?as=guide">{% icon "headphones" %}<span>Become a guide</span></a>
+    </p>
+  {% endif %}
+</article>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'js/about.js' %}"></script>{% endblock %}

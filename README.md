@@ -7,12 +7,12 @@
 
 # Stelleye
 
-**Live video help from sighted guides for blind and low-vision people, paid by the minute in USDC on Stellar.**
+**Live video help from sighted guides for visually impaired people, paid by the minute in USDC on Stellar.**
 
 **Try it live (Stellar testnet):** https://samanhazemijebelli--stelleye.us-east.modal.run. Sign in, open
 *Demo accounts*, and use Maria (caller) in one browser and Ana or Kofi (guide) in another.
 
-A blind person taps one big button (or picks a guide they trust). A verified guide video calls them
+A visually impaired person taps one big button (or picks a guide they trust). A verified guide video calls them
 on WhatsApp and describes what the camera sees: a medicine label, the right bus, a form. The
 caller's budget is locked in a Soroban smart contract before the call starts; when either side hangs
 up, the contract bills the exact seconds used from ledger time, refunds the rest instantly, and pays
@@ -170,7 +170,7 @@ the guide cash out 1.00 USDC to a bank account after confirming the amounts.
 
 ## Limitations and next steps
 
-- **Smart accounts.** Wallets are app-managed keys so blind users never handle seed phrases. Next: passkey smart accounts (Face ID / Touch ID) with fee sponsorship, so users own their funds and never need XLM.
+- **Smart accounts.** Wallets are app-managed keys so visually impaired users never handle seed phrases. Next: passkey smart accounts (Face ID / Touch ID) with fee sponsorship, so users own their funds and never need XLM.
 - **Going live with money.** The rails are production-shaped (Circle USDC, SEP-10/24). Mainnet needs a licensed anchor partnership (MoneyGram Ramps, Bitso, Fonbnk), its KYC, and Stelleye's compliance work. Anchor pages are hosted by the anchor, so their screen-reader accessibility must be part of choosing one.
 - **Zero XLM for users.** Accounts still get testnet XLM from friendbot. Next: sponsored reserves and fee bumps (or the OpenZeppelin Relayer), so users only ever hold USDC.
 - **Scale.** Presence and the channel layer are in-memory (one process). Next: Redis.

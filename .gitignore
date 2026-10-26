@@ -45,6 +45,7 @@ node_modules/
 .claude/
 design-system/
 docs/hackmeridian-submission.md
+*.pptx
 
 # OS / editors
 .DS_Store

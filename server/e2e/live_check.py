@@ -51,6 +51,7 @@ def main() -> None:
         check(True, "live socket through the deployment: Ana is online")
         sign_in(member, base, "maria", "/help/")
         member.click("#tab-guides")
+        member.click("#online-records summary")  # sections start folded
         card = member.locator("#guides-list .guide", has_text="Ana")
         expect(card).to_be_visible(timeout=15_000)
         check(True, "Maria sees Ana in Online now without reloading")

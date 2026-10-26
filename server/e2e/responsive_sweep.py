@@ -102,6 +102,12 @@ class Sweep:
 
         page.goto(f"{self.base}/")
         self.check(page, f"{tag} landing", touch, axe)
+        page.click(".about-link")
+        page.wait_for_url("**/about/")
+        self.check(page, f"{tag} about", touch, axe)
+        page.click("#clear-label")
+        if page.locator("#med-label.is-blurred").count() or page.get_attribute("#clear-label", "aria-pressed") != "true":
+            self.problems.append(f"{tag} about: the label did not come clear")
         page.goto(f"{self.base}/login/")
         page.click(".auth-demo summary")
         self.check(page, f"{tag} sign-in", touch, axe)

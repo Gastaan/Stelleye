@@ -65,6 +65,7 @@ def run_pair(pw, base: str, member_kind: str, guide_kind: str) -> list[str]:
             guide.click("#online-btn")
         expect(guide.locator("#online-btn")).to_have_attribute("aria-pressed", "true")
         member.click("#tab-guides")
+        member.click("#online-records summary")  # sections start folded
         expect(member.locator("#guides-list .guide", has_text="Ana")).to_be_visible(timeout=10_000)
         member.click("#tab-help")
         member.click("#help-btn")

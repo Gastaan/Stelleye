@@ -99,8 +99,8 @@
       </form>
       {% include "wallets/_transfer_panel.html" %}
     </div>
-    {# Folded by default; opens by itself when an earning is ready to withdraw. #}
-    <details class="records records--nested" id="earnings-records" {% if totals.ready != "0.00" %}open{% endif %}>
+    {# Folded by default, like every foldable section. #}
+    <details class="records records--nested" id="earnings-records">
       <summary><h3 class="records__title">{% icon "clock" "sm" %} Call history</h3></summary>
     <ul id="earnings-list" class="list">
       {% for call in calls %}
@@ -127,7 +127,7 @@
   </section>
 
   <section id="panel-account" class="tabpanel" role="tabpanel" aria-labelledby="tab-account" tabindex="0" hidden>
-    {% if profile.whatsapp %}{% include "people/_whatsapp_card.html" with help_text="People you help see this number when you call them." open=True %}{% endif %}
+    {% if profile.whatsapp %}{% include "people/_whatsapp_card.html" with help_text="People you help see this number when you call them." %}{% endif %}
     <section class="card" aria-labelledby="profile-title">
       <h2 id="profile-title" class="card-title">{% icon "user" %} Your profile</h2>
       <dl class="receipt__rows">
