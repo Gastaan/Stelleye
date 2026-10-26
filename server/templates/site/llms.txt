@@ -1,35 +1,69 @@
 # Stelleye
 
-> Stelleye: eyes on call for visually impaired people, paid on Stellar worldwide. A visually impaired person taps one big button, or calls a guide they trust; a verified sighted guide video calls them on WhatsApp and describes what the camera sees. The budget is locked in USDC on Stellar before the call, the exact seconds are billed when it ends, the rest comes straight back, and the guide is paid the moment the call ends.
+> Stelleye: eyes on call for visually impaired people, paid on Stellar worldwide. Live help from a verified sighted guide, paid by the second: the caller taps one big button, a guide anywhere in the world video calls them on WhatsApp and describes what the camera sees, and Stellar settles the call in seconds. No subscription, help around the clock, money that moves in seconds.
 
-Built for HackMeridian 2026 (Genesis category, Stellar Composed track). Runs on Stellar testnet.
+HackMeridian 2026 · Genesis · Stellar Composed. Live on Stellar testnet with Circle's USDC: {{ root }}/
+
+## Some things you just need to see
+
+A medicine label. A bus number. A letter. For visually impaired people, small moments like these decide the day. Visual help today is costly, local and hard to pay across borders:
+
+- **2.2 billion** people live with a vision impairment (WHO, 2026).
+- **$26 a month** buys 20 minutes of paid visual help in the US, about $1.30 a minute, sold as a subscription (Aira).
+- **At 3 a.m.** nearby helpers sleep, so help must come from abroad: help around the clock means a guide in another time zone, on an international call.
+- **6.49%** to send $200 across borders, often taking days (World Bank, 2025). Paying a guide a few dollars that way doesn't work.
+
+## The solution: five stops, one tap
+
+1. **Match:** tap *Get help*; a verified guide accepts, live.
+2. **Lock:** the budget is locked in USDC on Stellar.
+3. **Call:** the guide video calls you on WhatsApp.
+4. **Settle:** exact seconds billed; the rest comes back.
+5. **Pay:** the guide is paid the moment it ends, wherever they live.
+
+Why it wins: no subscription, help around the clock, money that moves in seconds. Callers pick the first available guide or a guide they saved; guides set their own rate (demo guides: 0.20 USDC a minute versus about $1.30 a minute for paid help in the US today).
+
+## Built on Stellar
+
+- **CallEscrow**, a Soroban smart contract in Rust ({{ escrow }}): `open` locks the caller's budget, `close` bills the exact seconds from ledger time and refunds the rest instantly, and `confirm` pays the guide at once, minus a 5% platform fee taken on-chain.
+- **On-chain guide registry:** every guide is approved with `verify_guide`, and the contract only locks money for verified guides: the *Verified guide on Stellar* badge.
+- **Circle's USDC** through its Stellar Asset Contract ({{ token }}): callers pay and guides earn in digital dollars.
+- **Real money rails (SEP-10 and SEP-24):** callers *Add money* by card or bank transfer and guides *Cash out* to a bank through a Stellar anchor, such as MoneyGram Ramps in production.
+- Every transaction is linked from the app to stellar.expert.
+
+## Market
+
+Two sides: people who need eyes, people who lend them.
+
+- **Who pays:** visually impaired people, a 2.2 billion-person need (WHO).
+- **Who earns:** sighted guides anywhere, paid in USDC in seconds.
+- **How we earn:** a 5% fee on each guide payout, taken on-chain.
+- **Why now:** stablecoins and Stellar make tiny global payouts practical.
+
+## Accessibility first
+
+Designed for visually impaired people from the first line: screen-reader-first structure and spoken live updates (*"Ana is calling you on WhatsApp now"*), WCAG AA contrast on every screen, 44 px touch targets, one big *Get help* button, light and dark themes, and a calm warm-orange design. Automated accessibility scans report 0 issues on every page.
+
+## Roadmap: from human guides to a fully automatic service
+
+1. **Now:** human guides on WhatsApp, per-second billing and instant payout on Stellar.
+2. **Passkeys:** Face ID passkey wallets and sponsored fees: no passwords, no XLM.
+3. **Global rails:** USDC top-ups from other chains (CCTP) and mainnet with a licensed anchor.
+4. **Fully automatic:** a 3D understanding and navigation visual harness serves requests and pays per request on Stellar.
+
+Vision: eyes on call for everyone, any hour, paid fairly; first with people, then fully automatic.
 
 ## Try it
 
-- [Live demo]({{ root }}/): open two windows and sign in from *Demo accounts* on the sign-in page. Ana (guide) taps *Go online*; Maria (caller) opens *Guides → Online now* and calls Ana. Kofi is a second guide.
-- [About: the problem]({{ root }}/about/): four referenced facts and a medicine label you can unblur.
-- [Sign up]({{ root }}/join/) as a caller or a guide; a Stellar wallet is created for you.
-
-## The problem
-
-Visual help today is costly, local and hard to pay across borders.
-
-- 2.2 billion people live with a vision impairment (WHO, 2026).
-- $26 a month buys 20 minutes of paid visual help in the US (Aira).
-- At 3 a.m. nearby helpers sleep, so help must come from abroad.
-- 6.49% to send $200 across borders, often taking days (World Bank, 2025).
-
-## How it uses Stellar
-
-- CallEscrow, a Soroban contract in Rust ({{ escrow }}): `open` locks the caller's budget; `close` bills per second from ledger time and refunds the rest; `confirm` pays the guide minus a 5% fee. A reviewer approves guides with `verify_guide`, and the contract refuses to lock money for unverified guides.
-- Circle's USDC through its Stellar Asset Contract ({{ token }}).
-- Add money and Cash out through a Stellar anchor (SEP-10 and SEP-24); production uses a licensed anchor such as MoneyGram Ramps.
+- [Live demo]({{ root }}/): open two windows and sign in from *Demo accounts*. Ana (guide) taps *Go online*; Maria (caller) opens *Guides → Online now* and calls Ana. Kofi is a second guide.
+- [About: the problem, shown]({{ root }}/about/): the four facts with sources and a medicine label you can unblur.
+- [Sign up]({{ root }}/join/) as a caller or as a guide; a Stellar wallet is created for you in seconds.
 
 ## Links
 
-- [Source code and README](https://github.com/Gastaan/Stelleye)
+- [Source code, README and pitch deck](https://github.com/Gastaan/Stelleye)
 - [CallEscrow on stellar.expert](https://stellar.expert/explorer/testnet/contract/{{ escrow }})
 
 ## Team
 
-Saman Hazemijebelli, founder, full-stack and Soroban developer.
+Saman Hazemijebelli, founder, full-stack and Soroban developer: a solo builder, end to end.
