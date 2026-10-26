@@ -1,208 +1,189 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/brand/stelleye-logo-dark.png">
-    <img src="docs/brand/stelleye-logo-light.png" alt="Stelleye" width="420">
+    <img src="docs/brand/stelleye-logo-light.png" alt="Stelleye" width="380">
   </picture>
 </p>
 
-# Stelleye
+<h3 align="center">Eyes on call for visually impaired people, paid on Stellar worldwide.</h3>
+<p align="center">HackMeridian 2026 · Genesis · Stellar Composed</p>
 
-**Live video help from sighted guides for visually impaired people, paid by the minute in USDC on Stellar.**
-
-<table>
+<table align="center">
   <tr>
-    <td>
-      <b>Try it live</b> (Stellar testnet): <a href="https://samanhazemijebelli--stelleye.us-east.modal.run">samanhazemijebelli--stelleye.us-east.modal.run</a><br><br>
-      Open two windows and sign in from <i>Demo accounts</i>:<br>
-      1. <b>Ana</b> (guide): tap <i>Go online</i>.<br>
-      2. <b>Maria</b> (caller): open <i>Guides</i>, then <i>Online now</i>, and call Ana.<br>
-      Kofi is a second guide if someone else is using Ana.
+    <td align="center" width="230">
+      <img src="docs/pitch/qr.png" width="200" alt="QR code that opens the live Stelleye demo"><br>
+      <b>Scan to try it</b>
     </td>
-    <td align="center">
-      <img src="docs/pitch/qr.png" width="150" alt="QR code that opens the live Stelleye demo"><br>
-      <sub>Scan to try it</sub>
+    <td>
+      <b><a href="https://samanhazemijebelli--stelleye.us-east.modal.run">Live demo</a></b> on Stellar testnet<br><br>
+      1. Sign in as <b>Ana</b> (guide) and tap <i>Go online</i>.<br>
+      2. In a second window, sign in as <b>Maria</b> (caller), open <i>Guides → Online now</i> and call Ana.<br><br>
+      <b>For judges:</b>
+      <a href="https://samanhazemijebelli--stelleye.us-east.modal.run/llms.txt">llms.txt</a> ·
+      <a href="https://samanhazemijebelli--stelleye.us-east.modal.run/robots.txt">robots.txt</a> ·
+      <a href="https://samanhazemijebelli--stelleye.us-east.modal.run/sitemap.xml">sitemap.xml</a> ·
+      <a href="docs/pitch/stelleye-pitch-deck.pdf">pitch deck (PDF)</a> ·
+      <a href="https://stellar.expert/explorer/testnet/contract/CAYXBP4DF3SG2J3224M6HA7X3OXVUCL2XLP3EWPPJ6LTX6UPFMBVUPTP">CallEscrow on stellar.expert</a>
     </td>
   </tr>
 </table>
 
-A visually impaired person taps one big button (or picks a guide they trust). A verified guide video calls them
-on WhatsApp and describes what the camera sees: a medicine label, the right bus, a form. The
-caller's budget is locked in a Soroban smart contract before the call starts; when either side hangs
-up, the contract bills the exact seconds used from ledger time, refunds the rest instantly, and pays
-the guide straight away.
+## The problem
 
-Money moves on real rails: callers **Add money** by card or bank transfer and guides **Cash out** to a
-bank through a Stellar anchor (SEP-24), in Circle's USDC. On testnet that is Stellar's test anchor and
-Circle's testnet USDC; production swaps in a licensed anchor such as MoneyGram Ramps by configuration.
+<img src="docs/readme/problem.svg" width="100%" alt="2.2 billion people live with a vision impairment (WHO). $26 a month buys 20 minutes of paid visual help in the US (Aira). At 3 a.m. nearby helpers are asleep, so help must come from another time zone. Sending $200 across borders costs 6.49% and often takes days (World Bank).">
 
-Built for **HackMeridian 2026** (Genesis category, Stellar Composed track: our Soroban contract with Circle USDC and the SEP-24 anchor rails).
+<table>
+  <tr>
+    <td width="300"><img src="docs/readme/label-blurred.png" width="280" alt="A medicine label blurred the way low vision can blur it"></td>
+    <td><b>Low vision can turn a medicine label into this.</b><br><br>Who it hurts: visually impaired people who just need a quick look, at any hour, anywhere.</td>
+  </tr>
+</table>
 
-## Pitch deck
+<sub>Sources: <a href="https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment">WHO</a> · <a href="https://aira.io/subscriptions/">Aira</a> · <a href="https://remittanceprices.worldbank.org/sites/default/files/rpw_main_report_and_annex_q125_1_0.pdf">World Bank</a></sub>
 
-HackMeridian 2026 · Genesis · Stellar Composed.
+## The solution
 
-<p>
-  <img src="docs/pitch/slide-1.jpg" width="49%" alt="Cover: Stelleye, eyes on call for visually impaired people, paid on Stellar worldwide, with a QR code to the live demo">
-  <img src="docs/pitch/slide-2.jpg" width="49%" alt="The problem: 2.2 billion people live with a vision impairment (WHO); $26 a month buys 20 minutes of paid visual help (Aira); at 3 a.m. help must come from abroad; sending $200 across borders costs 6.49% (World Bank)">
-</p>
-<p>
-  <img src="docs/pitch/slide-3.jpg" width="49%" alt="The solution: match, lock, call, settle, pay; the caller and guide screens on two phones">
-  <img src="docs/pitch/slide-4.jpg" width="49%" alt="Market: two sides, people who need eyes and people who lend them; a 5% fee on each guide payout; $1.30 a minute today versus 0.20 USDC a minute on Stelleye">
-</p>
-<p>
-  <img src="docs/pitch/slide-5.jpg" width="49%" alt="Roadmap: v1 human guides, passkey wallets, global rails, then a fully automatic 3D understanding and navigation visual harness">
-  <img src="docs/pitch/slide-6.jpg" width="49%" alt="The team: Saman Hazemijebelli, solo builder, with a QR code to try Stelleye">
+<img src="docs/readme/solution.svg" width="100%" alt="Five stops: Match, a verified guide accepts live; Lock, the budget is locked in USDC on Stellar; Call, the guide video calls you on WhatsApp; Settle, exact seconds billed and the rest comes back; Pay, the guide is paid the moment it ends.">
+
+<p align="center">
+  <img src="docs/readme/maria-phone.png" width="220" alt="Maria's screen: one big Get help now button">
+  &nbsp;&nbsp;
+  <img src="docs/readme/ana-phone.png" width="220" alt="Ana's screen: You're online, calls will ring here">
 </p>
 
-## Why
+### A call, second by second
 
-- Paid visual-interpretation services exist, but they are subscription-based, region-locked, and slow to pay their agents.
-- Volunteer apps are free but give no accountability, no choice of person, and no way to reward someone who helped.
-- Sighted people anywhere in the world could earn from this. Cross-border micro-payouts by the minute are exactly what Stellar is good at.
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Maria as Maria (caller)
+    participant App as Stelleye
+    participant Escrow as CallEscrow on Stellar
+    actor Ana as Ana (guide)
+    Maria->>App: Tap Get help
+    App->>Ana: Incoming call, live
+    Ana->>App: Accept
+    App->>Escrow: open() locks the budget in USDC
+    Ana->>Maria: WhatsApp video call
+    Note over Maria,Ana: Chat and meter run in Stelleye
+    Maria->>App: Hang up
+    App-->>Maria: Receipt opens at once
+    App->>Escrow: close() bills the exact seconds
+    Escrow-->>Maria: The rest comes back
+    App->>Escrow: confirm() pays the guide
+    Escrow-->>Ana: Paid in USDC, in seconds
+```
 
-## What a call looks like
+<img src="docs/readme/money.svg" width="100%" alt="A 45-second call at 0.20 USDC a minute: open() locks 3.00 USDC; close() bills 0.15 USDC from ledger time and refunds 2.85 USDC; confirm() pays Ana 0.1425 USDC, the 0.15 earned minus the 5% platform fee.">
 
-1. **Join and add money.** Choose *I need visual help* or *I want to be a guide*. Stelleye creates a Stellar wallet for you (no seed phrase to manage). Callers press *Add money*: the anchor's secure page opens in a new tab for the card or bank step, and Stelleye announces "Added 9.00 USDC" when the money arrives.
-2. **Guides are verified.** A reviewer approves each guide, and the approval is written to the guide registry inside the `CallEscrow` contract. The guide's page unlocks by itself.
-3. **Choose.** Callers see guides online right now (saved guides first, then cheapest, with languages and rates), or press *Get help now* for the first available.
-4. **Match → chat → payment lock.** When the guide accepts, a chat opens for both. The caller's budget is locked on-chain (`open`), and a progress row shows *Guide found → Payment locked*.
-5. **Video on WhatsApp.** The guide taps *Video call on WhatsApp* (on a Mac this opens the WhatsApp app, since WhatsApp Web cannot call). The caller hears *"Ana is calling you on WhatsApp now, answer the call"* and only has to answer. Stelleye keeps the meter and chat running, welcomes the caller back, and asks the guide to confirm the call connected.
-6. **WhatsApp only.** WhatsApp is the one video channel. If the call does not connect, the guide taps *Could not connect* and tries again; the caller can message the guide from the call screen. (An in-app WebRTC video mode exists for testing only, switched on with `INAPP_VIDEO_TEST_MODE=1`.)
-7. **Settle and pay.** Either side ends the call and the receipt opens at once; Stellar fills in the amounts seconds later (`close`: exact seconds billed, the rest refunded). v1 assumes the call helped, so Stelleye then releases the guide's earnings straight away (`confirm`, signed with the caller's custodial key) and both sides see the payment land.
-8. **Receipt.** The caller sees what they paid and got back, every transaction, the chat, and can *Save* the guide to call them directly next time. The contract also supports a hold with *Report a problem* (`report`, then a reviewer's `resolve`) and late withdrawal (`claim`); v1 does not use them.
-9. **Cash out.** Guides enter bank details on the anchor's page, then confirm in Stelleye ("send 3.00 USDC, you receive 2.70 USD"). Only then does Stelleye pay the anchor, once, and track it to "Sent to your bank".
+## Market
 
-## Stellar integration
+<img src="docs/readme/market.svg" width="100%" alt="People who need eyes pay only the seconds used; Stelleye earns 5% of each payout; sighted guides anywhere are paid in USDC in seconds. A minute of paid help in the US costs about $1.30; a Stelleye guide in the demo charges 0.20 USDC.">
+
+**Why now:** stablecoins and Stellar make tiny global payouts practical.
+
+## Roadmap
+
+<img src="docs/readme/roadmap.svg" width="100%" alt="Now: human guides on WhatsApp, per-second billing and instant payout on Stellar. Next: Face ID passkey wallets and sponsored fees. Then: USDC top-ups from other chains and mainnet with a licensed anchor. Vision: a fully automatic 3D understanding and navigation visual harness that pays per request.">
+
+## Team
+
+**Saman Hazemijebelli** · Founder · full-stack and Soroban developer: a solo builder, end to end.
+
+- Built Stelleye end to end: Soroban contract, Django app, Stellar money rails.
+- Accessibility first: screen-reader first, WCAG contrast, 44 px touch targets.
+- **Try it:** scan the code, sign in as Maria (caller) and Ana (guide), and make a call.
+
+## Under the hood
+
+<details>
+<summary><b>Architecture</b></summary>
+<br>
+
+<img src="docs/readme/architecture.svg" width="100%" alt="The Stelleye web app talks to Django and Channels on Modal over a live WebSocket and opens WhatsApp for the video; Django calls the CallEscrow Soroban contract, which holds Circle USDC, and uses a Stellar anchor to add money and cash out.">
+
+One live page per person keeps a call from ever running twice, and a reload during a paid call restores
+the call screen, chat, meter and WhatsApp state.
+</details>
+
+<details>
+<summary><b>Stellar integration</b></summary>
+<br>
 
 | Piece | Where |
 |---|---|
-| `CallEscrow` Soroban contract (Rust, soroban-sdk 29) | [`contracts/call_escrow/src/lib.rs`](contracts/call_escrow/src/lib.rs) |
+| `CallEscrow` Soroban contract (Rust) | [`contracts/call_escrow/src/lib.rs`](contracts/call_escrow/src/lib.rs) |
 | Deployed on testnet | [`CAYXBP4D…UPTP`](https://stellar.expert/explorer/testnet/contract/CAYXBP4DF3SG2J3224M6HA7X3OXVUCL2XLP3EWPPJ6LTX6UPFMBVUPTP) |
 | Circle's testnet USDC (Stellar Asset Contract) | [`CBIELTK6…DAMA`](https://stellar.expert/explorer/testnet/contract/CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA) |
-| Anchor client: SEP-1 discovery, SEP-10 sign-in, SEP-24 hosted deposit and withdrawal | [`server/stellar_bridge/anchor.py`](server/stellar_bridge/anchor.py), [`server/wallets/services.py`](server/wallets/services.py) |
-| Python contract client (simulate → sign → submit → decode, typed contract errors) | [`server/stellar_bridge/`](server/stellar_bridge/) |
-| Wallets (friendbot on testnet, USDC trustline, balances, payments with memos) | [`server/stellar_bridge/accounts.py`](server/stellar_bridge/accounts.py) |
+| Anchor client: SEP-1, SEP-10 sign-in, SEP-24 deposit and withdrawal | [`server/stellar_bridge/anchor.py`](server/stellar_bridge/anchor.py), [`server/wallets/services.py`](server/wallets/services.py) |
+| Contract client: simulate, sign, submit, decode | [`server/stellar_bridge/`](server/stellar_bridge/) |
 
-Contract lifecycle: `verify_guide` / `revoke_guide` (on-chain registry) → `open` (lock the budget) →
-`close` (per-second billing from ledger time, rounded up, capped at the budget; instant refund;
-earnings held) → `confirm` (v1 calls it right after `close`, paying the guide at once) | `report` → `resolve`
-(reviewer split) | `claim` (after the hold); the last two are kept for a later version with disputes.
-A 5% platform fee is taken only on what the guide receives. Every transaction is linked from the UI to
-stellar.expert.
+Contract lifecycle: `verify_guide` (the on-chain guide registry) → `open` (lock the budget) → `close`
+(per-second billing from ledger time, rounded up and capped at the budget; instant refund) → `confirm`
+(the guide is paid at once, minus a 5% platform fee). The contract also carries `report` and `resolve`
+for disputes. Every transaction is linked from the app to stellar.expert.
+</details>
 
-Each call remembers the contract it was opened on, so redeploys never strand a call. Calls made before
-the switch to Circle's USDC ran on an earlier contract with a self-issued demo token
-(`CCBNJTJT…HQI4C`) and still settle there. Only test money is used: the anchor is
-`testanchor.stellar.org`, and its hosted pages accept made-up details.
+<details>
+<summary><b>Run it locally</b></summary>
+<br>
 
-## Brand
-
-The mark is an eye whose iris is a small planet with a gold orbit, a nod to Stellar's star-and-orbit
-feel (an original mark, not Stellar's logo), with a star as the catchlight. Files are in
-[`docs/brand/`](docs/brand/) (SVG mark, app icon, PNG lockups) and `server/static/img/`.
-
-## Accessibility
-
-- Screen-reader first: one assertive live region announces every state change once ("Ana says: …", "Payment secured", "About one minute of your budget is left"). Focus moves only when a new view appears.
-- Huge targets (the main button is 290 px), visible focus, 4.5:1 contrast, reduced motion, light and dark themes, Atkinson Hyperlegible type.
-- Optional speech without a screen reader, plus vibration and tone cues.
-- Sign-up works with password managers, has an error summary that takes focus, and errors linked to their fields.
-- **axe-core (WCAG 2.2 AA): 0 violations** on every page in the end-to-end run, including the live call screens in both themes.
-
-## Architecture
-
-```
-Browser (Django templates + vanilla JS modules)
-  member.js / guide.js ── stage.js (call stage: WhatsApp hand-off, meter, chat) · chat.js · money.js
-                           └─ videocall.js (WebRTC, simple-peer; test mode only)
-        │  WebSocket /ws/live/  (presence, matching, chat, WhatsApp hand-off, resume)
-Django 5.2 + Channels 4 (Daphne)
-  calls/      consumer, matching, call services, chat, WhatsApp hand-off
-  people/     sign-up, profiles, saved guides, verification
-  disputes/   reports and reviewer decisions
-  wallets/    app-managed Stellar keys (v1), Add money / Cash out
-  stellar_bridge/  Soroban RPC, Horizon and SEP-10/24 anchor client
-        │                                   │
-Stellar testnet: CallEscrow + Circle USDC   Anchor (testanchor.stellar.org → MoneyGram in production)
-```
-
-One live page per person: opening Stelleye in a second tab or device takes over, and the older page
-offers *Use Stelleye here*, so a call can never run twice. Reloading during a paid call restores the
-call screen, chat, meter and WhatsApp hand-off state.
-
-## Run it
-
-Requirements: Python 3.11, [uv](https://docs.astral.sh/uv/), and for redeploying the contract the Stellar CLI and a Rust toolchain.
+Needs Python 3.11, [uv](https://docs.astral.sh/uv/), Rust and the Stellar CLI.
 
 ```bash
-cd server
+cd contracts && stellar contract build && cd ../server
 uv venv && uv pip install -r pyproject.toml
 .venv/bin/python manage.py migrate
 .venv/bin/python manage.py setup_testnet --asset-issuer GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5
-                                           # deploys CallEscrow for Circle testnet USDC, writes server/.env
-.venv/bin/python manage.py seed_demo       # Maria (caller), Ana and Kofi (guides), reviewer; password "sightline"
-.venv/bin/python manage.py runserver 8000 --nostatic   # --nostatic: scripts are never served stale
-.venv/bin/python e2e/fund_demo.py --times 2  # tops Maria up with 18 USDC through the test anchor
+.venv/bin/python manage.py seed_demo                   # Maria, Ana, Kofi and a reviewer
+.venv/bin/python manage.py runserver 8000 --nostatic
 ```
+</details>
 
-Open http://localhost:8000. With `DJANGO_DEBUG=1` the sign-in page lists one-tap demo accounts.
-
-**Video on a Mac.** The guide's button opens the WhatsApp app with `whatsapp://send?phone=…`, because
-calls work only in WhatsApp for Mac, not WhatsApp Web. Phones get the universal `https://wa.me/…` link.
-In-app WebRTC video is off in the product (WhatsApp only). For testing it, start the server with
-`INAPP_VIDEO_TEST_MODE=1`; on restrictive networks add a TURN relay, e.g. Metered's Open Relay (free monthly
-allowance; create an account to get credentials):
-
-```bash
-WEBRTC_ICE_SERVERS='[{"urls":"stun:stun.l.google.com:19302"},{"urls":["turn:global.relay.metered.ca:80","turns:global.relay.metered.ca:443?transport=tcp"],"username":"<user>","credential":"<pass>"}]'
-```
-For phones, serve over HTTPS (for example with a tunnel).
-
-## Deploy on Modal
-
-`modal_app.py` serves the Django ASGI app (pages, API and the live WebSocket) from one always-warm
-container: presence and the call channel live in that process's memory. WebSockets stay open for up to
-24 hours, and the SQLite database runs on the container's disk with a consistent copy saved to a Modal
-Volume every few seconds and on shutdown, then restored on start.
+<details>
+<summary><b>Deploy on Modal</b></summary>
+<br>
 
 ```bash
 modal volume create stelleye-data
-modal volume put stelleye-data server/db.sqlite3 /db.sqlite3     # optional: start from an existing database
 modal secret create stelleye-env --from-dotenv server/.env DJANGO_SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')"
 modal deploy modal_app.py
-server/.venv/bin/python server/e2e/live_check.py --base https://<workspace>--stelleye.us-east.modal.run   # a real call
 ```
+One always-warm container serves the pages, the API and the live WebSocket; the database is saved to a
+Modal Volume every few seconds.
+</details>
 
-## Tests
+<details>
+<summary><b>Tests</b></summary>
+<br>
 
 ```bash
-cd server
-uv pip install --group dev -r pyproject.toml && .venv/bin/python -m playwright install chromium webkit
-.venv/bin/python manage.py test                 # 51 unit tests, no network (fake escrow and fake anchor)
-.venv/bin/python e2e/run_e2e.py                 # full journey on testnet: 3 browsers, fake camera, axe scans
-.venv/bin/python e2e/run_money.py               # real-money rails: Add money and Cash out through the test anchor
-.venv/bin/python e2e/responsive_sweep.py        # every page on laptops, iPad and phones, light and dark, axe
-INAPP_VIDEO_TEST_MODE=1 .venv/bin/python manage.py runserver 8000 --nostatic   # then, for the test-only in-app video:
-.venv/bin/python e2e/video_matrix.py            # Mac matrix: Safari engine (WebKit) and Chrome, every pairing
+cd server && uv pip install --group dev -r pyproject.toml && .venv/bin/python -m playwright install chromium webkit
+.venv/bin/python manage.py test                 # 53 unit tests
+.venv/bin/python e2e/run_e2e.py                 # the full journey on Stellar testnet, with accessibility scans
+.venv/bin/python e2e/run_money.py               # Add money and Cash out through the anchor
+.venv/bin/python e2e/responsive_sweep.py        # every page on laptops, iPad and phones, light and dark
+.venv/bin/python e2e/live_check.py --base <url> # a real two-device call on any deployment
 cd ../contracts && cargo test                   # 11 contract tests
 ```
+</details>
 
-The end-to-end run signs up a new caller and a new guide (real testnet wallets) and covers:
-- the reviewer verifying the guide on-chain;
-- the caller seeing the guide appear live, calling them, and the budget locking on-chain;
-- the WhatsApp hand-off (Mac app link for the guide, `wa.me` for the phone);
-- two-way chat and saving the guide;
-- that no in-app video option is offered (WhatsApp only), or, when the server runs in test mode, the WebRTC video with fake cameras;
-- reloading mid-call, then settling, the receipt, paying the guide, and adding money through the anchor.
+<details>
+<summary><b>The pitch deck</b></summary>
+<br>
 
-The money run adds 10 USD for a new caller (9.00 USDC arrives), makes a paid call, pays the guide, and has
-the guide cash out 1.00 USDC to a bank account after confirming the amounts.
+<a href="docs/pitch/stelleye-pitch-deck.pdf">Download the deck (PDF)</a>
 
-## Limitations and next steps
-
-- **Smart accounts.** Wallets are app-managed keys so visually impaired users never handle seed phrases. Next: passkey smart accounts (Face ID / Touch ID) with fee sponsorship, so users own their funds and never need XLM.
-- **Going live with money.** The rails are production-shaped (Circle USDC, SEP-10/24). Mainnet needs a licensed anchor partnership (MoneyGram Ramps, Bitso, Fonbnk), its KYC, and Stelleye's compliance work. Anchor pages are hosted by the anchor, so their screen-reader accessibility must be part of choosing one.
-- **Zero XLM for users.** Accounts still get testnet XLM from friendbot. Next: sponsored reserves and fee bumps (or the OpenZeppelin Relayer), so users only ever hold USDC.
-- **Scale.** Presence and the channel layer are in-memory (one process). Next: Redis.
-- **Dispute evidence.** The contract has a `recording_hash` field that is still unused. Next: store a hash of the chat transcript (and, with consent, a recording) there at the end of each call.
-- **Guide verification** is a manual reviewer step today. Next: ID checks before the on-chain approval.
+<p>
+  <img src="docs/pitch/slide-1.jpg" width="49%" alt="Cover">
+  <img src="docs/pitch/slide-2.jpg" width="49%" alt="The problem">
+</p>
+<p>
+  <img src="docs/pitch/slide-3.jpg" width="49%" alt="The solution">
+  <img src="docs/pitch/slide-4.jpg" width="49%" alt="Market">
+</p>
+<p>
+  <img src="docs/pitch/slide-5.jpg" width="49%" alt="Roadmap">
+  <img src="docs/pitch/slide-6.jpg" width="49%" alt="The team">
+</p>
+</details>
