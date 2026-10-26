@@ -9,6 +9,9 @@ from .models import LANGUAGES, Profile
 
 
 class SignupForm(forms.Form):
+    # The page order: typed fields first, then the choices you tap (keeps the error summary in the same order).
+    field_order = ["display_name", "username", "password", "whatsapp", "city", "role", "languages", "rate"]
+
     role = forms.ChoiceField(
         choices=[(Profile.Role.MEMBER, "I need visual help"), (Profile.Role.GUIDE, "I want to be a guide")],
         error_messages={"required": "Choose whether you need help or want to be a guide."},
